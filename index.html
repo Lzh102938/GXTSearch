@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GXT 文本解析器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --background:#09090b;--foreground:#fafafa;
+  --card:#09090b;--card-foreground:#fafafa;
+  --popover:#09090b;--popover-foreground:#fafafa;
+  --primary:#6366f1;--primary-foreground:#fff;
+  --secondary:#27272a;--secondary-foreground:#fafafa;
+  --muted:#27272a;--muted-foreground:#a1a1aa;
+  --accent:#27272a;--accent-foreground:#fafafa;
+  --destructive:#7f1d1d;--border:#27272a;--input:#27272a;--ring:#6366f1;
+  --radius:1rem;
+  --font-sans:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code','Consolas',monospace;
+}
+html{font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{background:var(--background);color:var(--foreground);font-family:var(--font-sans);line-height:1.6;min-height:100vh}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#52525b}
+
+/* Layout */
+.page{max-width:1200px;margin:0 auto;padding:0 1.5rem 3rem}
+
+
+/* Hero */
+.hero{padding:2.5rem 0 1.5rem;border-bottom:1px solid var(--border)}
+.hero h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;display:flex;align-items:center;gap:0.6rem}
+.hero p{color:var(--muted-foreground);font-size:0.85rem;margin-top:0.4rem}
+
+/* Upload */
+.upload{border:1px dashed #3f3f46;border-radius:var(--radius);padding:2rem;text-align:center;cursor:pointer;transition:all 0.3s ease-out;margin:1.5rem 0}
+.upload:hover{border-color:var(--primary);background:rgba(99,102,241,0.04)}
+.upload.has-file{padding:0.8rem 1.2rem;border-style:solid;border-color:rgba(39,39,42,0.6);display:flex;align-items:center;gap:0.8rem;text-align:left;background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px)}
+.upload .icon{font-size:1.8rem;margin-bottom:0.5rem;opacity:0.4}
+.upload p{color:var(--muted-foreground);font-size:0.82rem}
+.upload input{display:none}
+.uf-name{font-family:var(--font-mono);color:var(--foreground);font-weight:600;font-size:0.82rem}
+.uf-size{color:var(--muted-foreground);font-size:0.75rem;font-family:var(--font-mono)}
+.uf-badge{background:var(--primary);color:var(--primary-foreground);padding:0.15rem 0.5rem;border-radius:9999px;font-size:0.68rem;font-weight:600}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;margin:1.5rem 0}
+.stat{background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);padding:0.8rem 1rem;transition:all 0.3s ease-out}
+.stat:hover{box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 8px 10px -6px rgba(0,0,0,0.1);transform:translateY(-2px);border-color:rgba(63,63,70,0.6)}
+.stat .sl{font-size:0.68rem;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.15rem}
+.stat .sv{font-size:1.1rem;font-weight:700;font-family:var(--font-mono);color:var(--foreground)}
+
+/* Tabs */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1rem;overflow-x:auto}
+.tab{background:none;border:none;color:var(--muted-foreground);padding:0.6rem 1rem;cursor:pointer;font-size:0.82rem;font-weight:500;border-bottom:2px solid transparent;transition:all 0.15s;font-family:var(--font-sans);white-space:nowrap}
+.tab:hover{color:var(--foreground)}.tab.active{color:var(--foreground);border-bottom-color:var(--primary)}
+.panel{display:none}.panel.active{display:block}
+
+/* Card */
+.card{background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);overflow:hidden;transition:all 0.3s ease-out}
+.card:hover{border-color:rgba(63,63,70,0.6)}
+.card-header{padding:0.8rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap}
+.card-header h3{font-size:0.85rem;font-weight:600;flex:1}
+.card-body{padding:1rem}
+
+/* Button */
+.btn{display:inline-flex;align-items:center;gap:0.4rem;background:var(--secondary);border:1px solid rgba(39,39,42,0.6);color:var(--foreground);padding:0.45rem 0.9rem;border-radius:var(--radius);cursor:pointer;font-size:0.78rem;font-family:var(--font-sans);font-weight:500;transition:all 0.2s ease-out}
+.btn:hover{background:#3f3f46;border-color:#52525b}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-primary:hover{background:#4f46e5;border-color:#4f46e5}
+.btn-sm{padding:0.3rem 0.6rem;font-size:0.72rem;border-radius:0.6rem}
+
+/* Input */
+.input{background:var(--muted);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.8rem;color:var(--foreground);font-size:0.82rem;font-family:var(--font-sans);outline:none;transition:border-color 0.15s}
+.input:focus{border-color:var(--primary)}
+.input::placeholder{color:var(--muted-foreground)}
+.select{background:var(--muted);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.6rem;color:var(--foreground);font-size:0.78rem;font-family:var(--font-sans);outline:none;cursor:pointer}
+
+/* Search */
+.search-box{display:flex;align-items:center;gap:0;border:1px solid rgba(39,39,42,0.6);border-radius:var(--radius);background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);overflow:hidden;padding:0 0.8rem;transition:border-color 0.2s ease-out}
+.search-box:focus-within{border-color:var(--primary)}
+.search-box .si{color:var(--muted-foreground);font-size:0.85rem;flex-shrink:0}
+.search-box input{flex:1;background:none;border:none;color:var(--foreground);padding:0.6rem 0.6rem;font-size:0.85rem;font-family:var(--font-sans);outline:none}
+.search-box input::placeholder{color:var(--muted-foreground)}
+.search-meta{display:flex;align-items:center;gap:0.3rem}
+.search-count{font-family:var(--font-mono);font-size:0.72rem;color:var(--muted-foreground);white-space:nowrap}
+.search-nav button{background:none;border:none;color:var(--muted-foreground);cursor:pointer;padding:0.2rem 0.3rem;font-size:0.8rem;border-radius:4px}
+.search-nav button:hover{color:var(--foreground);background:var(--muted)}
+.search-nav button:disabled{opacity:0.3}
+
+/* Adv search */
+.adv-toggle{background:none;border:none;color:var(--muted-foreground);cursor:pointer;padding:0.3rem;border-radius:4px;font-size:0.78rem}.adv-toggle:hover{color:var(--foreground)}.adv-toggle.on{color:var(--primary)}
+.adv-panel{border-top:1px solid var(--border);padding:0.8rem 1rem;display:none}.adv-panel.open{display:block}
+.adv-row{display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;margin-bottom:0.4rem}
+.adv-row:last-child{margin-bottom:0}
+.adv-l{font-size:0.72rem;color:var(--muted-foreground);min-width:4rem;text-align:right;flex-shrink:0}
+.adv-g{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.adv-o{background:var(--muted);border:none;border-right:1px solid var(--border);color:var(--muted-foreground);padding:0.25rem 0.5rem;cursor:pointer;font-size:0.7rem;font-family:var(--font-sans);transition:all 0.1s}
+.adv-o:last-child{border-right:none}.adv-o:hover{color:var(--foreground)}.adv-o.on{color:var(--primary-foreground);background:var(--primary)}
+.adv-i{background:var(--muted);border:1px solid var(--border);border-radius:var(--radius);padding:0.25rem 0.4rem;color:var(--foreground);font-size:0.72rem;font-family:var(--font-sans);outline:none;width:70px}.adv-i:focus{border-color:var(--primary)}
+.adv-chk{display:flex;align-items:center;gap:0.25rem;cursor:pointer;font-size:0.72rem;color:var(--muted-foreground)}.adv-chk input{accent-color:var(--primary)}
+.shortcut-bar{font-size:0.68rem;color:var(--muted-foreground);padding:0.4rem 1rem;border-top:1px solid var(--border);display:flex;gap:0.8rem;flex-wrap:wrap}
+.shortcut-bar kbd{background:var(--muted);border:1px solid var(--border);padding:0 0.25rem;border-radius:3px;font-family:var(--font-mono);font-size:0.65rem;color:var(--muted-foreground)}
+
+/* History */
+.history-panel{border-top:1px solid var(--border);padding:0.5rem 1rem;display:none}.history-panel.open{display:block}
+.hst-title{font-size:0.68rem;color:var(--muted-foreground);margin-bottom:0.25rem;text-transform:uppercase;letter-spacing:0.04em}
+.hst-list{display:flex;gap:0.25rem;flex-wrap:wrap}
+.hst-item{background:var(--muted);border:1px solid var(--border);border-radius:4px;padding:0.15rem 0.45rem;font-size:0.7rem;color:var(--muted-foreground);cursor:pointer;font-family:var(--font-mono)}
+.hst-item:hover{color:var(--primary);border-color:var(--primary)}
+
+/* Match highlight */
+.mh{background:rgba(99,102,241,0.2);color:#a5b4fc;padding:0 0.1rem;border-radius:2px}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;overflow-y:auto;max-height:70vh;border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px)}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--muted);padding:0.5rem 0.7rem;text-align:left;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted-foreground);border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;position:sticky;top:0;z-index:2}
+thead th:hover{color:var(--foreground)}
+thead th.sorted::after{content:' ▾';color:var(--primary)}
+thead th.sorted-asc::after{content:' ▴';color:var(--primary)}
+tbody{contain:layout style paint}
+tbody td{padding:0.4rem 0.7rem;border-bottom:1px solid rgba(39,39,42,0.5);font-size:0.8rem;vertical-align:top}
+tbody tr{content-visibility:auto;contain-intrinsic-size:auto 2.5rem}
+tbody tr:hover{background:rgba(99,102,241,0.04)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--primary)}
+.td-tbl{font-family:var(--font-mono);color:#a78bfa;font-size:0.72rem;white-space:nowrap}
+.td-key{font-family:var(--font-mono);font-weight:600;color:#4ade80;white-space:nowrap;cursor:pointer}
+.td-key:hover{text-decoration:underline}
+.td-off{font-family:var(--font-mono);color:var(--muted-foreground);font-size:0.72rem;cursor:pointer}
+.td-off:hover{color:var(--primary)}
+.td-txt{color:var(--foreground);word-break:break-word;max-width:460px;line-height:1.5}
+.td-act{white-space:nowrap}
+.tk{display:inline;background:rgba(99,102,241,0.1);color:#a5b4fc;padding:0 0.2rem;border-radius:2px;font-family:var(--font-mono);font-size:0.72rem}
+.tk-c{display:inline-block;width:0.7em;height:0.7em;border-radius:2px;vertical-align:middle;margin-right:0.15rem;border:1px solid rgba(255,255,255,0.12)}
+
+.ctrl-bar{display:flex;gap:0.5rem;align-items:center;margin-bottom:0.8rem;flex-wrap:wrap}
+.entry-count{font-size:0.72rem;color:var(--muted-foreground);font-family:var(--font-mono);white-space:nowrap}
+
+/* Parse log */
+.log-ctrl{display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;flex-wrap:wrap}
+.sg{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.sb,.lf{background:var(--muted);border:none;border-right:1px solid var(--border);color:var(--muted-foreground);padding:0.3rem 0.55rem;cursor:pointer;font-size:0.72rem;font-family:var(--font-sans);transition:all 0.1s}
+.sb:last-child,.lf:last-child{border-right:none}.sb:hover,.lf:hover{color:var(--foreground)}.sb.on,.lf.on{color:var(--primary-foreground);background:var(--primary)}
+.sg-label{font-size:0.72rem;color:var(--muted-foreground);margin-right:0.15rem}
+.progress{height:2px;background:var(--muted);border-radius:1px;overflow:hidden;margin-bottom:0.5rem}
+.progress .fill{height:100%;background:var(--primary);width:0;transition:width 0.08s}
+.progress-text{font-size:0.7rem;color:var(--muted-foreground);font-family:var(--font-mono);margin-bottom:0.5rem}
+.log{background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);padding:0.5rem 0.7rem;height:400px;overflow-y:auto;font-family:var(--font-mono);font-size:0.73rem;line-height:1.85}
+.le{display:flex;gap:0.5rem;align-items:flex-start}
+.le .ln{color:var(--muted-foreground);min-width:2rem;text-align:right;flex-shrink:0;opacity:0.4}
+.le .arr{color:var(--primary);flex-shrink:0;opacity:0.5}
+.le .msg{flex:1;word-break:break-all}
+.tag{display:inline-block;padding:0 0.3rem;border-radius:3px;font-size:0.62rem;font-weight:700;margin-right:0.25rem;vertical-align:middle}
+.tag-h{background:rgba(99,102,241,0.12);color:#818cf8}
+.tag-s{background:rgba(168,85,247,0.1);color:#c084fc}
+.tag-e{background:rgba(74,222,128,0.08);color:#4ade80}
+.tag-i{background:rgba(161,161,170,0.1);color:var(--muted-foreground)}
+.tag-w{background:rgba(239,68,68,0.1);color:#f87171}
+.hv{color:#e4e4e7;background:rgba(255,255,255,0.04);padding:0 0.2rem;border-radius:2px}
+
+/* Hex */
+.hex-card .card-header{gap:0.4rem}
+.hex-legend{display:flex;gap:0.5rem;flex-wrap:wrap}
+.hex-legend span{display:flex;align-items:center;gap:0.2rem;font-size:0.65rem;color:var(--muted-foreground)}
+.dot{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+.dot-blue{background:rgba(99,102,241,0.5)}
+.dot-purple{background:rgba(168,85,247,0.4)}
+.dot-green{background:rgba(74,222,128,0.4)}
+.dot-amber{background:rgba(251,191,36,0.3)}
+.dot-red{background:rgba(239,68,68,0.3)}
+.dot-cyan{background:rgba(34,211,238,0.4)}
+.hex-nav{display:flex;gap:0.25rem;align-items:center;flex-wrap:wrap}
+.hex-nav button{background:var(--muted);border:1px solid var(--border);color:var(--muted-foreground);padding:0.2rem 0.4rem;border-radius:4px;cursor:pointer;font-size:0.7rem;font-family:var(--font-sans)}
+.hex-nav button:hover{color:var(--foreground)}
+.hex-nav input{width:6ch;background:var(--muted);border:1px solid var(--border);color:var(--primary);padding:0.2rem 0.3rem;border-radius:4px;font-family:var(--font-mono);font-size:0.7rem;text-align:center;outline:none}
+.hex-nav input:focus{border-color:var(--primary)}
+.hex-body{padding:0.5rem 0.7rem;font-family:var(--font-mono);font-size:0.72rem;line-height:1.85;overflow:auto;height:480px;contain:layout style paint}
+.hx-line{white-space:nowrap;height:1.85em;position:absolute}
+.hx-addr{color:var(--muted-foreground);min-width:6ch;margin-right:0.7ch;cursor:pointer}.hx-addr:hover{color:var(--primary)}
+.hx-bytes{display:inline}
+.hx-b{display:inline-block;width:2.4ch;text-align:center;margin-right:0.25ch;border-radius:2px;cursor:pointer;transition:background 0.08s}
+.hx-b:hover{background:#3f3f46!important}
+.hx-sep{display:inline-block;width:0.7ch}
+.hx-ascii{margin-left:0.8ch;color:var(--muted-foreground);letter-spacing:0.03em}
+.hx-ascii span{cursor:pointer}.hx-ascii span:hover{color:var(--foreground)}
+.hl-header{background:rgba(99,102,241,0.12);color:#818cf8}
+.hl-section{background:rgba(168,85,247,0.08);color:#c084fc}
+.hl-key{background:rgba(74,222,128,0.08);color:#4ade80}
+.hl-text{background:rgba(251,191,36,0.06);color:#fbbf24}
+.hl-offset{background:rgba(239,68,68,0.08);color:#f87171}
+.hl-name{background:rgba(34,211,238,0.08);color:#22d3ee}
+.hl-active{outline:1.5px solid var(--primary);outline-offset:-1px;z-index:1;position:relative}
+
+/* Tooltip */
+.ttip{position:fixed;background:#18181b;border:1px solid #3f3f46;color:var(--foreground);padding:0.35rem 0.55rem;border-radius:var(--radius);font-size:0.72rem;font-family:var(--font-mono);pointer-events:none;z-index:999;max-width:340px;box-shadow:0 4px 12px rgba(0,0,0,0.5);line-height:1.5;display:none;white-space:pre}
+.ttip.show{display:block}
+
+/* Flow overlay */
+.flow-bg{position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:100;display:none;align-items:center;justify-content:center;padding:0.8rem}
+.flow-bg.open{display:flex}
+.flow{background:var(--background);border:1px solid var(--border);border-radius:calc(var(--radius)*2);width:100%;max-width:1060px;max-height:94vh;display:flex;flex-direction:column;overflow:hidden}
+.flow-hdr{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 1rem;background:var(--muted);border-bottom:1px solid var(--border);flex-shrink:0}
+.flow-hdr h3{font-size:0.88rem;font-weight:600;font-family:var(--font-mono);color:var(--foreground);flex:1}
+.flow-x{background:none;border:none;color:var(--muted-foreground);cursor:pointer;font-size:1.1rem;padding:0.15rem 0.3rem;border-radius:4px;line-height:1}.flow-x:hover{color:var(--foreground);background:var(--secondary)}
+.flow-map{display:flex;gap:2px;padding:0.6rem 1rem;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;align-items:stretch}
+.fm{padding:0.25rem 0.5rem;border-radius:var(--radius);font-size:0.68rem;font-family:var(--font-mono);font-weight:600;white-space:nowrap;display:flex;align-items:center;border:1px solid transparent;transition:all 0.2s;flex-shrink:0}
+.fm.active{outline:2px solid var(--primary);outline-offset:1px;z-index:1}.fm.done{opacity:0.35}
+.fm-t{background:rgba(99,102,241,0.1);color:#818cf8;border-color:rgba(99,102,241,0.15)}
+.fm-n{background:rgba(34,211,238,0.08);color:#22d3ee;border-color:rgba(34,211,238,0.12)}
+.fm-k{background:rgba(168,85,247,0.1);color:#c084fc;border-color:rgba(168,85,247,0.15)}
+.fm-d{background:rgba(251,191,36,0.08);color:#fbbf24;border-color:rgba(251,191,36,0.12)}
+.fm-arr{display:flex;align-items:center;color:var(--muted-foreground);font-size:0.6rem;padding:0 0.1rem;flex-shrink:0}
+.flow-bytes{padding:0.6rem 1rem;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
+.fb-row{display:flex;gap:0;align-items:flex-end;margin-bottom:0.1rem;min-width:min-content}
+.fb-addr{font-family:var(--font-mono);font-size:0.65rem;color:var(--muted-foreground);padding:0.1rem 0.35rem 0.1rem 0;white-space:nowrap;align-self:center;flex-shrink:0}
+.fb-cell{display:flex;flex-direction:column;align-items:center;min-width:2.4rem;margin-right:1px}
+.fb-hx{font-family:var(--font-mono);font-size:0.74rem;font-weight:600;padding:0.12rem 0.08rem;border-radius:3px;line-height:1.2;text-align:center;background:var(--secondary);color:var(--muted-foreground);transition:all 0.2s}
+.fb-hx.act{outline:2px solid var(--primary);outline-offset:1px;background:rgba(99,102,241,0.12);color:var(--foreground)}
+.fb-hx.ok{background:rgba(74,222,128,0.08);color:#4ade80}
+.fb-lbl{font-size:0.5rem;color:var(--muted-foreground);text-align:center;margin-top:1px;max-width:2.4rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.2;transition:all 0.2s}.fb-lbl.act{color:var(--primary);font-weight:600}
+.flow-decode{padding:0.45rem 1rem;background:rgba(99,102,241,0.04);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;min-height:2rem}
+.fd-l{font-size:0.72rem;color:var(--muted-foreground);flex-shrink:0}
+.fd-v{font-family:var(--font-mono);font-size:0.85rem;color:var(--foreground);font-weight:700}
+.fd-arr{color:var(--muted-foreground);font-size:0.7rem}
+.fd-b{font-family:var(--font-mono);font-size:0.7rem;color:var(--muted-foreground);background:var(--muted);padding:0.12rem 0.35rem;border-radius:3px}
+.flow-exp{flex:1;overflow-y:auto;padding:0.5rem 1rem;min-height:0}
+.fe{padding:0.35rem 0;border-bottom:1px solid rgba(39,39,42,0.3);opacity:0.2;transition:all 0.2s}
+.fe.act{opacity:1;background:rgba(99,102,241,0.04);margin:0 -0.7rem;padding:0.35rem 0.7rem;border-radius:var(--radius)}.fe.ok{opacity:0.45}
+.fe-t{font-weight:600;font-size:0.8rem;margin-bottom:0.08rem;display:flex;align-items:center;gap:0.3rem}
+.fe-n{display:inline-flex;align-items:center;justify-content:center;width:1.3rem;height:1.3rem;border-radius:50%;background:var(--muted);color:var(--muted-foreground);font-size:0.6rem;font-family:var(--font-mono);flex-shrink:0}
+.fe.act .fe-n{background:var(--primary);color:#fff}.fe.ok .fe-n{background:#16a34a;color:#fff}
+.fe-d{font-size:0.78rem;color:var(--muted-foreground);line-height:1.5;padding-left:1.7rem}
+.flow-ctrl{display:flex;gap:0.35rem;align-items:center;padding:0.45rem 1rem;border-top:1px solid var(--border);background:var(--muted);flex-shrink:0;flex-wrap:wrap}
+.flow-ctrl button{background:var(--secondary);border:1px solid var(--border);color:var(--muted-foreground);padding:0.28rem 0.55rem;border-radius:var(--radius);cursor:pointer;font-size:0.72rem;font-family:var(--font-sans);transition:all 0.12s}.flow-ctrl button:hover{color:var(--foreground)}
+.fsp{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.fsp b{background:var(--muted);border:none;border-right:1px solid var(--border);color:var(--muted-foreground);padding:0.22rem 0.4rem;cursor:pointer;font-size:0.68rem;font-family:var(--font-sans);font-weight:400}
+.fsp b:last-child{border-right:none}.fsp b:hover{color:var(--foreground)}.fsp b.on{color:var(--primary-foreground);background:var(--primary)}
+.fs-st{font-size:0.7rem;color:var(--muted-foreground);font-family:var(--font-mono);margin-left:auto}
+
+/* Structure */
+.struct-grid{display:grid;grid-template-columns:240px 1fr;gap:0.75rem;min-height:500px}
+.struct-list{background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);overflow-y:auto;max-height:560px}
+.si{padding:0.45rem 0.7rem;cursor:pointer;border-bottom:1px solid rgba(39,39,42,0.3);transition:all 0.08s;display:flex;justify-content:space-between;align-items:center;gap:0.4rem}
+.si:hover{background:var(--muted)}.si.active{background:rgba(99,102,241,0.06);border-left:3px solid var(--primary);padding-left:calc(0.7rem - 3px)}
+.si .si-n{font-family:var(--font-mono);font-size:0.78rem;font-weight:500}.si .si-c{font-size:0.65rem;color:var(--muted-foreground);font-family:var(--font-mono);background:var(--muted);padding:0.08rem 0.35rem;border-radius:3px}
+.struct-detail{background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);padding:1rem;overflow-y:auto;max-height:560px}
+.sd-h{display:flex;align-items:baseline;gap:0.6rem;margin-bottom:0.2rem;flex-wrap:wrap}
+.sd-h h3{font-size:1rem;font-weight:700;font-family:var(--font-mono);color:var(--foreground)}
+.sd-h .sd-t{font-size:0.72rem;color:var(--muted-foreground);background:var(--muted);padding:0.12rem 0.35rem;border-radius:3px}
+.sd-meta{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.8rem;padding:0.5rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.sd-meta .md{display:flex;flex-direction:column}.sd-meta .md .ml{font-size:0.6rem;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.04em}.sd-meta .md .mv{font-family:var(--font-mono);font-size:0.75rem;color:var(--muted-foreground)}
+.sd-search{margin-bottom:0.5rem}.sd-search input{width:100%;background:var(--muted);border:1px solid var(--border);border-radius:var(--radius);padding:0.35rem 0.5rem;color:var(--foreground);font-size:0.78rem;font-family:var(--font-sans);outline:none}.sd-search input:focus{border-color:var(--primary)}
+.sd-entries{max-height:340px;overflow-y:auto}
+.sd-r{display:grid;grid-template-columns:3ch minmax(8ch,14ch) 1fr auto;gap:0.5rem;padding:0.25rem 0.35rem;border-bottom:1px solid rgba(39,39,42,0.2);font-size:0.78rem;align-items:baseline}
+.sd-r:hover{background:rgba(99,102,241,0.04)}
+.sd-r .ri{color:var(--muted-foreground);font-family:var(--font-mono);font-size:0.65rem}
+.sd-r .rk{color:#4ade80;font-family:var(--font-mono);font-weight:500;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sd-r .rk:hover{text-decoration:underline}
+.sd-r .rv{color:var(--foreground);word-break:break-word;line-height:1.45;min-width:0}
+
+/* Footer */
+.footer{border-top:1px solid var(--border);padding:2rem 0 1.5rem;margin-top:3rem}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
+.footer p{font-size:0.75rem;color:var(--muted-foreground)}
+.footer a{color:var(--muted-foreground);text-decoration:none;font-size:0.75rem}.footer a:hover{color:var(--foreground)}
+
+@media(max-width:900px){
+  .struct-grid{grid-template-columns:1fr}.struct-list{max-height:180px}
+  .page{padding:0 1rem 2rem}.stats{grid-template-columns:repeat(2,1fr)}
+  .flow{max-width:100%}.flow-map{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header style="border-bottom:1px solid var(--border);padding:0.8rem 0;margin-bottom:0.5rem">
+  <div style="max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;gap:0.8rem">
+    <div style="width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.8rem;color:#fff;font-family:var(--font-mono)">GXT</div>
+    <div>
+      <div style="font-weight:700;font-size:1rem">GXT 文本解析器</div>
+      <div style="color:var(--muted-foreground);font-size:0.72rem">GTA III / Vice City / San Andreas / IV · 文本文件分析工具</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:0.5rem">
+      <button class="btn" onclick="exportJSON()">导出 JSON</button>
+      <button class="btn" onclick="exportCSV()">导出 CSV</button>
+      <button class="btn" onclick="exportFXT()">导出 FXT</button>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+  <!-- Hero -->
+  <div class="hero">
+    <h1>GXT 文本解析器</h1>
+    <p>解析 GTA III / Vice City / San Andreas / IV 的 GXT 文本文件，支持中文汉化版自动识别编码</p>
+  </div>
+
+  <!-- Upload -->
+  <div class="upload" id="uploadZone">
+    <div class="icon">📂</div>
+    <p>拖放 .gxt 文件到此处，或点击选择</p>
+    <p style="font-size:0.72rem;opacity:0.4;margin-top:0.2rem">自动识别 III / VC / SA / IV 格式 · 支持 UTF-8 / GBK / Windows-1252 编码</p>
+    <input type="file" id="fileInput" accept=".gxt,.txt,.fxt,.dat,.bin">
+  </div>
+
+  <div id="mainContent" style="display:none">
+    <!-- Stats -->
+    <div class="stats" id="statsBar"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="parse">解析日志</button>
+      <button class="tab" data-tab="hex">十六进制</button>
+      <button class="tab" data-tab="entries">文本条目</button>
+      <button class="tab" data-tab="structure">文件结构</button>
+      <button class="tab" data-tab="stats">文本统计</button>
+    </div>
+
+    <!-- Parse Log -->
+    <div class="panel active" id="panel-parse">
+      <div class="log-ctrl">
+        <span class="sg-label">速度</span>
+        <div class="sg">
+          <button class="sb" data-speed="0">跳过</button><button class="sb" data-speed="1">1×</button><button class="sb on" data-speed="5">5×</button><button class="sb" data-speed="20">20×</button><button class="sb" data-speed="100">100×</button>
+        </div>
+        <span class="sg-label" style="margin-left:0.4rem">过滤</span>
+        <div class="sg">
+          <button class="lf on" data-filter="all">全部</button><button class="lf" data-filter="header">头部</button><button class="lf" data-filter="section">分段</button><button class="lf" data-filter="entry">条目</button><button class="lf" data-filter="warn">警告</button>
+        </div>
+      </div>
+      <div class="progress" id="parseProgress"><div class="fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText"></div>
+      <div class="log" id="parseLog"></div>
+    </div>
+
+    <!-- Hex -->
+    <div class="panel" id="panel-hex">
+      <div class="card hex-card">
+        <div class="card-header">
+          <h3>二进制视图</h3>
+          <div class="hex-legend">
+            <span><span class="dot dot-blue"></span>块头</span><span><span class="dot dot-purple"></span>段名</span><span><span class="dot dot-red"></span>偏移</span><span><span class="dot dot-green"></span>键名</span><span><span class="dot dot-amber"></span>文本</span><span><span class="dot dot-cyan"></span>表名</span>
+          </div>
+          <div class="hex-nav">
+            <button onclick="hexNav('start')">起始</button><button onclick="hexNav('tabl')">TABL</button><button onclick="hexNav('first-tkey')">TKEY</button><button onclick="hexNav('first-tdat')">TDAT</button>
+            <input type="text" id="hexAddrInput" placeholder="000000" onkeydown="if(event.key==='Enter')hexNavAddr()">
+            <button onclick="hexNavAddr()">→</button>
+          </div>
+        </div>
+        <div class="hex-body" id="hexBody"></div>
+      </div>
+    </div>
+
+    <!-- Entries -->
+    <div class="panel" id="panel-entries">
+      <div class="card" style="margin-bottom:0.8rem">
+        <div class="search-box">
+          <span class="si">🔍</span>
+          <input type="text" id="searchField" placeholder="搜索键名或文本内容…" autocomplete="off">
+          <div class="search-meta">
+            <span class="search-count" id="searchCount"></span>
+            <div class="search-nav"><button id="searchPrev" disabled>‹</button><button id="searchNext" disabled>›</button></div>
+            <button class="adv-toggle" id="advToggle" title="高级搜索">⚙</button>
+            <button class="adv-toggle" id="histToggle" title="搜索历史">🕐</button>
+          </div>
+        </div>
+        <div class="adv-panel" id="searchAdv">
+          <div class="adv-row"><span class="adv-l">匹配模式</span><div class="adv-g" data-adv="mode"><button class="adv-o on" data-val="contains">包含</button><button class="adv-o" data-val="exact">精确</button><button class="adv-o" data-val="regex">正则</button><button class="adv-o" data-val="wildcard">通配符</button><button class="adv-o" data-val="fuzzy">模糊</button></div></div>
+          <div class="adv-row"><span class="adv-l">搜索范围</span><div class="adv-g" data-adv="scope"><button class="adv-o on" data-val="all">全部</button><button class="adv-o" data-val="key">仅键名</button><button class="adv-o" data-val="text">仅文本</button></div><span class="adv-l" style="min-width:2.5rem">子表</span><select class="select" id="advTableFilter" style="font-size:0.72rem;padding:0.3rem 0.45rem"><option value="">全部</option></select></div>
+          <div class="adv-row"><span class="adv-l">选项</span><label class="adv-chk"><input type="checkbox" id="advCase"> 大小写</label><label class="adv-chk"><input type="checkbox" id="advNegate"> 排除</label><span class="adv-l" style="min-width:2.5rem">偏移</span><input class="adv-i" id="advOffFrom" placeholder="起始"><span style="color:var(--muted-foreground);font-size:0.7rem">—</span><input class="adv-i" id="advOffTo" placeholder="结束"><span class="adv-l" style="min-width:2.5rem">长度</span><input class="adv-i" id="advLenMin" placeholder="最小" style="width:45px"><span style="color:var(--muted-foreground);font-size:0.7rem">—</span><input class="adv-i" id="advLenMax" placeholder="最大" style="width:45px"></div>
+          <div class="adv-row"><span class="adv-l">Token</span><div class="adv-g" data-adv="token"><button class="adv-o on" data-val="">不限</button><button class="adv-o" data-val="has">含Token</button><button class="adv-o" data-val="none">无Token</button></div><span class="adv-l" style="min-width:2.5rem">指定</span><div class="adv-g" data-adv="tokentype"><button class="adv-o on" data-val="">全部</button><button class="adv-o" data-val="~r~">~r~</button><button class="adv-o" data-val="~g~">~g~</button><button class="adv-o" data-val="~b~">~b~</button><button class="adv-o" data-val="~w~">~w~</button><button class="adv-o" data-val="~h~">~h~</button><button class="adv-o" data-val="~k~">~k~</button></div></div>
+        </div>
+        <div class="history-panel" id="searchHistory"><div class="hst-title">搜索历史</div><div class="hst-list" id="shList"></div></div>
+        <div class="shortcut-bar"><span><kbd>/</kbd> 聚焦</span><span><kbd>Enter</kbd> 下一个</span><span><kbd>Shift+Enter</kbd> 上一个</span><span><kbd>Esc</kbd> 清除</span></div>
+      </div>
+      <div class="ctrl-bar"><span class="entry-count" id="entryInfo"></span><button class="btn btn-sm btn-primary" onclick="copyAllVisible()">复制可见</button><button class="btn btn-sm" onclick="exportFiltered()">导出筛选</button></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th data-sort="table">子表</th><th data-sort="key">键名</th><th data-sort="absOffset">偏移</th><th data-sort="text">文本内容</th><th>操作</th></tr></thead><tbody id="entriesBody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- Structure -->
+    <div class="panel" id="panel-structure">
+      <div class="struct-grid">
+        <div class="struct-list" id="structList"></div>
+        <div class="struct-detail" id="structDetail">
+          <div style="text-align:center;padding:2.5rem;color:var(--muted-foreground)">
+            <div style="font-size:1.8rem;margin-bottom:0.5rem;opacity:0.3">📋</div>
+            <p style="font-size:0.82rem">点击左侧子表查看条目</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 统计 -->
+    <div class="panel" id="panel-stats">
+      <div id="statsContent"></div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-inner">
+      <p>© 2026 GXT 文本解析器</p>
+      <div style="display:flex;gap:1rem">
+        <a href="#">帮助</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Flow Overlay -->
+<div class="flow-bg" id="flowOverlay">
+  <div class="flow">
+    <div class="flow-hdr"><h3 id="flowTitle">解析流程</h3><button class="flow-x" onclick="closeFlow()">✕</button></div>
+    <div class="flow-map" id="flowMap"></div>
+    <div class="flow-bytes" id="flowBytes"></div>
+    <div class="flow-decode" id="flowDecode"></div>
+    <div class="flow-exp" id="flowExplain"></div>
+    <div class="flow-ctrl">
+      <button onclick="flowStep(-1)">◀ 上一步</button>
+      <button onclick="flowTogglePlay()" id="flowPlayBtn">▶ 播放</button>
+      <button onclick="flowStep(1)">下一步 ▶</button>
+      <div class="fsp"><b data-fs="600">慢</b><b class="on" data-fs="250">中</b><b data-fs="100">快</b></div>
+      <span class="fs-st" id="flowStatus">0 / 0</span>
+    </div>
+  </div>
+</div>
+
+<div class="ttip" id="tooltip"></div>
+
+<script>
+// ========== PARSER ==========
+class GXTParser {
+  constructor(buf){this.d=new Uint8Array(buf);this.v=new DataView(buf);this.r={format:'unknown',version:null,bits:8,tables:[],entries:[],totalEntries:0};this.logs=[];this.hl=[];this._li=0;}
+  log(m,t='info'){this._li++;this.logs.push({i:this._li,msg:m,tag:t});}
+  hlAdd(s,l,t){if(l>0)this.hl.push({s,l,t});}
+  u16(o){return this.v.getUint16(o,true);}
+  u32(o){return this.v.getUint32(o,true);}
+  str(o,max=8){let s='';for(let i=0;i<max;i++){const b=this.d[o+i];if(!b)break;s+=String.fromCharCode(b);}return s;}
+  utf16(o){const c=[];let i=o;while(i+1<this.d.length){const lo=this.d[i],hi=this.d[i+1];if(!lo&&!hi)break;c.push(String.fromCharCode(lo|(hi<<8)));i+=2;}return c.join('');}
+  w1252(o){let end=o;while(end<this.d.length&&this.d[end])end++;const bytes=this.d.slice(o,end);let s='';for(const b of bytes){if(b<0x80)s+=String.fromCharCode(b);else if(b===0x80)s+='\u20AC';else if(b===0x82)s+='\u201A';else if(b===0x83)s+='\u0192';else if(b===0x84)s+='\u201E';else if(b===0x85)s+='\u2026';else if(b===0x86)s+='\u2020';else if(b===0x87)s+='\u2021';else if(b===0x88)s+='\u02C6';else if(b===0x89)s+='\u2030';else if(b===0x8A)s+='\u0160';else if(b===0x8B)s+='\u2039';else if(b===0x8C)s+='\u0152';else if(b===0x8E)s+='\u017D';else s+=String.fromCharCode(b);}return s;}
+  smartDecode(o){let end=o;while(end<this.d.length&&this.d[end])end++;const bytes=this.d.slice(o,end);if(!bytes.length)return'';let hasMB=false;for(const b of bytes){if(b>=0xC0){hasMB=true;break;}}if(hasMB){try{return new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{}try{return new TextDecoder('gbk',{fatal:true}).decode(bytes);}catch{}}return this.w1252(o);}
+  detect(){const d=this.d;if(d.length>8){const ver=this.u16(0),bits=this.u16(2);if((ver===3||ver===4)&&(bits===8||bits===16)&&d[4]===0x54&&d[5]===0x41&&d[6]===0x42&&d[7]===0x4C){this.r.format='sa';this.r.version=ver;this.r.bits=bits;this.log(`检测格式: <span class="hv">GTA SA/IV</span> v${ver} ${bits}bit`,'header');return;}}if(d[0]===0x54&&d[1]===0x41&&d[2]===0x42&&d[3]===0x4C){const sz=this.u32(4),n=Math.floor(sz/12);if(n>0&&n<500&&this.str(8,8)==='MAIN'){this.r.format='vc';this.log(`检测格式: <span class="hv">GTA Vice City</span> (${n} 子表)`,'header');return;}}if(d[0]===0x54&&d[1]===0x4B&&d[2]===0x45&&d[3]===0x59){this.r.format='iii';this.log('检测格式: <span class="hv">GTA III</span>','header');return;}this.r.format='vc';this.log('尝试 VC 格式','warn');}
+  parse(){this.detect();if(this.r.format==='vc')return this.parseVC();if(this.r.format==='iii')return this.parseIII();return this.parseSA();}
+  parseVC(){this.log('<span class="tag tag-h">TABL</span> 读取块头 <span class="hv">0x000000</span>','header');this.hlAdd(0,4,'header');const tablSz=this.u32(4);this.hlAdd(4,4,'header');const nTbl=Math.floor(tablSz/12);this.log(`<span class="tag tag-h">TABL</span> 块大小: <span class="hv">${tablSz}</span> 字节, <span class="hv">${nTbl}</span> 个子表引用`,'header');const tbls=[];for(let i=0;i<nTbl;i++){const o=8+i*12;const name=this.str(o,8);const off=this.u32(o+8);tbls.push({name,off});this.hlAdd(o,8,'name');this.hlAdd(o+8,4,'offset');}this.log(`<span class="tag tag-s">TABL</span> 子表: ${tbls.slice(0,10).map(t=>'<span class="hv">'+t.name+'</span>').join(', ')}${tbls.length>10?' … 共'+tbls.length+'个':''}`,'section');for(const tbl of tbls)this.parseVCSub(tbl.name,tbl.off);this.r.totalEntries=this.r.entries.length;return this.r;}
+  parseVCSub(name,startOff){let tkeyStart=startOff;if(name==='MAIN'){this.log(`<span class="tag tag-s">${name}</span> 主表 @ <span class="hv">0x${this.hex(startOff)}</span>`,'section');}else{tkeyStart=startOff+8;const actualName=this.str(startOff,8);this.log(`<span class="tag tag-s">${name}</span> @ <span class="hv">0x${this.hex(startOff)}</span>, 名称 \"<span class="hv">${actualName}</span>\", TKEY @ <span class="hv">0x${this.hex(tkeyStart)}</span>`,'section');this.hlAdd(startOff,8,'name');}const tkeyMagic=this.str(tkeyStart,4);if(tkeyMagic!=='TKEY'){this.log(`<span class="tag tag-w">异常</span> 期望 TKEY @ 0x${this.hex(tkeyStart)}`,'warn');return;}this.hlAdd(tkeyStart,4,'header');const tkeySz=this.u32(tkeyStart+4);this.hlAdd(tkeyStart+4,4,'header');const nEnt=Math.floor(tkeySz/12);this.log(`<span class="tag tag-h">TKEY</span> <span class="hv">${tkeySz}</span> B → <span class="hv">${nEnt}</span> 条 (12B: 4偏移+8键名)`,'header');const tdatStart=tkeyStart+8+tkeySz;const tdatSz=this.u32(tdatStart+4);const textBase=tdatStart+8;this.hlAdd(tdatStart,4,'header');this.hlAdd(tdatStart+4,4,'header');this.log(`<span class="tag tag-h">TDAT</span> @ <span class="hv">0x${this.hex(tdatStart)}</span>, <span class="hv">${tdatSz}</span> B, 文本 @ <span class="hv">0x${this.hex(textBase)}</span>`,'header');const tbl={name,tkeyOff:tkeyStart,tkeySz,tdatOff:tdatStart,tdatSz,cnt:nEnt,entries:[],textBase};const kStart=tkeyStart+8;for(let i=0;i<nEnt;i++){const eo=kStart+i*12;const relOff=this.u32(eo);const key=this.str(eo+4,8);const absOff=textBase+relOff;let text=absOff<this.d.length-1?this.utf16(absOff):'';this.hlAdd(eo+4,8,'key');this.hlAdd(eo,4,'offset');const tb=Math.min(text.length*2,128);if(absOff+tb<=this.d.length)this.hlAdd(absOff,tb,'text');const entry={table:name,key,idx:i,offset:relOff,absOffset:absOff,text,eo,entrySize:12};this.r.entries.push(entry);tbl.entries.push(entry);if(i<3||i===nEnt-1){const disp=text.length>70?text.substring(0,70)+'…':text;this.log(`<span class="tag tag-e">[${i}]</span> <span class="hv">"${key}"</span> → "${this.escHTML(disp)}"`,'entry');}else if(i===3)this.log(`<span class="tag tag-i">…</span> 还有 ${nEnt-4} 个条目`,'info');}this.r.tables.push(tbl);this.log(`<span class="tag tag-s">${name}</span> ✓ <span class="hv">${nEnt}</span> 条`,'section');}
+  parseIII(){this.log('<span class="tag tag-h">TKEY</span> GTA III 格式','header');this.hlAdd(0,4,'header');const tkeySz=this.u32(4);this.hlAdd(4,4,'header');const nEnt=Math.floor(tkeySz/8);this.log(`<span class="tag tag-h">TKEY</span> <span class="hv">${tkeySz}</span> B → <span class="hv">${nEnt}</span> 条 (8B: 4偏移+4键名)`,'header');const tdatStart=8+tkeySz;const tdatSz=this.u32(tdatStart+4);const textBase=tdatStart+8;this.hlAdd(tdatStart,4,'header');this.hlAdd(tdatStart+4,4,'header');this.log(`<span class="tag tag-h">TDAT</span> @ <span class="hv">0x${this.hex(tdatStart)}</span>, <span class="hv">${tdatSz}</span> B`,'header');const tbl={name:'MAIN',tkeyOff:0,tkeySz,tdatOff:tdatStart,tdatSz,cnt:nEnt,entries:[],textBase};for(let i=0;i<nEnt;i++){const eo=8+i*8;const relOff=this.u32(eo);const key=this.str(eo+4,4);const absOff=textBase+relOff;let text=absOff<this.d.length-1?this.utf16(absOff):'';const entry={table:'MAIN',key,idx:i,offset:relOff,absOffset:absOff,text,eo,entrySize:8};this.r.entries.push(entry);tbl.entries.push(entry);this.hlAdd(eo+4,4,'key');this.hlAdd(eo,4,'offset');if(i<3||i===nEnt-1){const disp=text.length>70?text.substring(0,70)+'…':text;this.log(`<span class="tag tag-e">[${i}]</span> <span class="hv">"${key}"</span> → "${this.escHTML(disp)}"`,'entry');}else if(i===3)this.log(`<span class="tag tag-i">…</span> 还有 ${nEnt-4} 个条目`,'info');}this.r.tables.push(tbl);this.r.totalEntries=this.r.entries.length;this.log(`<span class="tag tag-s">MAIN</span> ✓ <span class="hv">${nEnt}</span> 条`,'section');return this.r;}
+  parseSA(){const hdr=this.r.version?4:0;if(hdr){this.log(`<span class="tag tag-h">HEAD</span> v<span class="hv">${this.r.version}</span>, <span class="hv">${this.r.bits}</span>bit`,'header');this.hlAdd(0,4,'header');}const tablOff=hdr;this.hlAdd(tablOff,4,'header');const tablSz=this.u32(tablOff+4);this.hlAdd(tablOff+4,4,'header');const nTbl=Math.floor(tablSz/12);this.log(`<span class="tag tag-h">TABL</span> <span class="hv">${nTbl}</span> 个子表`,'header');const tbls=[];for(let i=0;i<nTbl;i++){const o=tablOff+8+i*12;const name=this.str(o,8);const off=this.u32(o+8);tbls.push({name,off});this.hlAdd(o,8,'name');this.hlAdd(o+8,4,'offset');}this.log(`<span class="tag tag-s">TABL</span> 子表: ${tbls.slice(0,10).map(t=>'<span class="hv">'+t.name+'</span>').join(', ')}${tbls.length>10?' … 共'+tbls.length+'个':''}`,'section');for(const t of tbls)this.parseSASub(t.name,t.off);this.r.totalEntries=this.r.entries.length;return this.r;}
+  parseSASub(name,startOff){let tkeyStart=startOff;if(name!=='MAIN')tkeyStart=startOff+8;const tkeySz=this.u32(tkeyStart+4);const nEnt=Math.floor(tkeySz/8);const tdatStart=tkeyStart+8+tkeySz;const textBase=tdatStart+8;this.log(`<span class="tag tag-s">${name}</span> TKEY @ <span class="hv">0x${this.hex(tkeyStart)}</span>, <span class="hv">${nEnt}</span> 条`,'section');const tbl={name,tkeyOff:tkeyStart,tkeySz,tdatOff:tdatStart,tdatSz:this.u32(tdatStart+4),cnt:nEnt,entries:[],textBase};const is16=this.r.bits===16;for(let i=0;i<nEnt;i++){const eo=tkeyStart+8+i*8;const relOff=this.u32(eo);const crc=this.u32(eo+4);const absOff=textBase+relOff;let text='';if(absOff<this.d.length){text=is16?this.utf16(absOff):this.smartDecode(absOff);}const key='0x'+crc.toString(16).padStart(8,'0');const entry={table:name,key,crc,idx:i,offset:relOff,absOffset:absOff,text,eo,entrySize:8};this.r.entries.push(entry);tbl.entries.push(entry);if(i<3||i===nEnt-1){const disp=text.length>70?text.substring(0,70)+'…':text;this.log(`<span class="tag tag-e">[${i}]</span> <span class="hv">${key}</span> → "${this.escHTML(disp)}"`,'entry');}else if(i===3)this.log(`<span class="tag tag-i">…</span> 还有 ${nEnt-4} 个条目`,'info');}this.r.tables.push(tbl);this.log(`<span class="tag tag-s">${name}</span> ✓ <span class="hv">${nEnt}</span> 条`,'section');}
+  hex(n){return n.toString(16).padStart(6,'0');}
+  escHTML(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+}
+
+// ========== STATE ==========
+let parser=null,allEntries=[],rawData=null,filteredEntries=[];
+let sortState={col:'table',dir:'asc'},parseSpeed=5,logFilter='all';
+let searchHistory=[],currentMatchIdx=-1,matchIndices=[];
+const tooltip=document.getElementById('tooltip');
+let flowSteps=[],flowCurrentStep=-1,flowPlaying=false,flowTimer=null,flowSpeed=250;
+
+// ========== UPLOAD ==========
+const uz=document.getElementById('uploadZone'),fi=document.getElementById('fileInput');
+uz.addEventListener('click',()=>fi.click());
+uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('dragover');});
+uz.addEventListener('dragleave',()=>uz.classList.remove('dragover'));
+uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('dragover');if(e.dataTransfer.files.length)loadFile(e.dataTransfer.files[0]);});
+fi.addEventListener('change',()=>{if(fi.files.length)loadFile(fi.files[0]);});
+function loadFile(f){const r=new FileReader();r.onload=e=>{rawData=new Uint8Array(e.target.result);uz.classList.add('has-file');uz.innerHTML=`<div style="display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0"><span class="uf-name">${f.name}</span><span class="uf-size">${(f.size/1024).toFixed(1)} KB</span><span class="uf-badge" id="fiFormat">检测中…</span></div><button class="btn btn-sm" onclick="document.getElementById('fileInput').click()">更换</button><input type="file" id="fileInput" accept=".gxt,.txt,.fxt,.dat,.bin">`;document.getElementById('fileInput').addEventListener('change',()=>{if(document.getElementById('fileInput').files.length)loadFile(document.getElementById('fileInput').files[0]);});document.getElementById('mainContent').style.display='block';doParse(e.target.result);};r.readAsArrayBuffer(f);}
+
+async function doParse(buf){parser=new GXTParser(buf);allEntries=[];document.getElementById('parseLog').innerHTML='';document.getElementById('progressFill').style.width='0%';document.getElementById('progressText').textContent='';parser.detect();const fmt=document.getElementById('fiFormat');if(fmt)fmt.textContent=parser.r.format==='sa'?'SA/IV':parser.r.format.toUpperCase();const result=await animatedParse(parser);allEntries=result.entries;filteredEntries=[...allEntries];renderStats(result);renderHex();renderEntries(allEntries);renderStructure(result.tables);populateFilter(result.tables);renderStatsPanel();}
+
+async function animatedParse(p){const result=p.parse();const logEl=document.getElementById('parseLog');const fill=document.getElementById('progressFill');const ptxt=document.getElementById('progressText');const total=p.logs.length;const step=parseSpeed<=0?total:parseSpeed;for(let i=0;i<total;i+=step){const batch=p.logs.slice(i,i+step);for(const l of batch){const d=document.createElement('div');d.className='le';d.dataset.tag=l.tag;if(logFilter!=='all'&&l.tag!==logFilter)d.style.display='none';d.innerHTML=`<span class="ln">${l.i}</span><span class="arr">›</span><span class="msg">${l.msg}</span>`;logEl.appendChild(d);}const pct=Math.min(100,((i+step)/total*100)).toFixed(0);fill.style.width=pct+'%';ptxt.textContent=`${pct}% · ${result.entries.length} 条 · ${result.tables.length} 子表`;if(parseSpeed<100){logEl.scrollTop=logEl.scrollHeight;await new Promise(r=>requestAnimationFrame(r));}}const d=document.createElement('div');d.className='le';d.dataset.tag='info';d.innerHTML=`<span class="ln">${total+1}</span><span class="arr">✓</span><span class="msg"><span class="tag tag-e">完成</span> ${result.tables.length} 子表, ${result.entries.length} 条文本</span>`;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;fill.style.width='100%';ptxt.textContent=`完成 · ${result.tables.length} 子表 · ${result.entries.length.toLocaleString()} 条 · ${(rawData.length/1024).toFixed(0)} KB`;return result;}
+
+function renderStats(r){document.getElementById('statsBar').innerHTML=[{l:'格式',v:'SA/IV'},{l:'子表',v:r.tables.length},{l:'条目',v:r.entries.length.toLocaleString()},{l:'大小',v:`${(rawData.length/1024).toFixed(0)} KB`},{l:'编码',v:r.format==='sa'?(r.bits===16?'UTF-16':'智能检测'):'UTF-16LE'}].map(s=>`<div class="stat"><div class="sl">${s.l}</div><div class="sv">${s.v}</div></div>`).join('');}
+
+// ========== HEX ==========
+let hexRendered=false;
+function renderHex(){hexRendered=false;document.getElementById('hexBody').innerHTML='';}
+let hexData=[]; // precomputed hex lines
+let hexTotal=0;
+const HEX_LINE_H=18; // line height in px
+
+function ensureHexRendered(){
+  if(hexRendered)return;
+  hexRendered=true;
+  const body=document.getElementById('hexBody');
+  const d=rawData;const bpl=16;
+  hexTotal=Math.ceil(d.length/bpl);
+  const hl=parser.hl;
+  
+  // Precompute highlight map
+  const hlMap=new Map();
+  for(const h of hl){for(let o=h.s;o<h.s+h.l;o++)hlMap.set(o,h.t);}
+  
+  // Store raw data reference for on-demand rendering
+  body.innerHTML='';
+  body.style.position='relative';
+  
+  // Sentinel for scroll height
+  const sentinel=document.createElement('div');
+  sentinel.style.cssText=`position:absolute;left:0;width:1px;height:${hexTotal*HEX_LINE_H}px;pointer-events:none;`;
+  body.appendChild(sentinel);
+  
+  function renderVisible(){
+    const scrollTop=body.scrollTop;
+    const viewH=body.clientHeight;
+    const start=Math.max(0,Math.floor(scrollTop/HEX_LINE_H)-5);
+    const end=Math.min(hexTotal,Math.ceil((scrollTop+viewH)/HEX_LINE_H)+5);
+    
+    // Remove old lines
+    body.querySelectorAll('.hx-line').forEach(el=>el.remove());
+    
+    const frag=document.createDocumentFragment();
+    for(let ln=start;ln<end;ln++){
+      const addr=ln*bpl;
+      const line=document.createElement('div');
+      line.className='hx-line';
+      line.style.cssText=`position:absolute;top:${ln*HEX_LINE_H}px;height:${HEX_LINE_H}px;white-space:nowrap;`;
+      
+      let html=`<span class="hx-addr" onclick="navigator.clipboard?.writeText('0x'+this.textContent)">${addr.toString(16).padStart(6,'0')}</span><span class="hx-bytes">`;
+      let ascii='';
+      for(let i=0;i<bpl;i++){
+        const off=addr+i;
+        if(off>=d.length){html+='   ';ascii+=' ';continue;}
+        const b=d[off];
+        const hlCls=hlMap.get(off);
+        html+=`<span class="hx-b${hlCls?' hl-'+hlCls:''}" data-off="${off}" onmouseenter="showByteTooltip(event,${off},${b})" onmouseleave="hideTooltip()">${b.toString(16).padStart(2,'0')}</span>`;
+        if(i===7)html+='<span class="hx-sep"></span>';
+        ascii+=(b>=32&&b<127)?String.fromCharCode(b):'.';
+      }
+      html+=`</span><span class="hx-ascii">${ascii}</span>`;
+      line.innerHTML=html;
+      frag.appendChild(line);
+    }
+    body.appendChild(frag);
+  }
+  
+  renderVisible();
+  let ticking=false;
+  body.addEventListener('scroll',()=>{
+    if(!ticking){requestAnimationFrame(()=>{renderVisible();ticking=false;});ticking=true;}
+  },{passive:true});
+  body._renderHex=renderVisible;
+}
+function showByteTooltip(e,off,b){let info=`0x${off.toString(16).padStart(6,'0')} = 0x${b.toString(16).padStart(2,'0')} (${b})`;if(parser){for(const tbl of parser.r.tables){if(off>=tbl.tkeyOff&&off<tbl.tkeyOff+8+tbl.tkeySz){if(off<tbl.tkeyOff+8)info+=`\n${tbl.name} TKEY 头`;else{const ei=Math.floor((off-tbl.tkeyOff-8)/12);if(ei<tbl.entries.length)info+=`\nTKEY[${ei}]: "${tbl.entries[ei].key}"`;}break;}if(off>=tbl.tdatOff&&off<tbl.tdatOff+8+tbl.tdatSz){info+=`\n${tbl.name} TDAT`;break;}}}tooltip.textContent=info;tooltip.classList.add('show');tooltip.style.left=(e.clientX+12)+'px';tooltip.style.top=(e.clientY-10)+'px';}
+function hideTooltip(){tooltip.classList.remove('show');}
+function hexNav(t){ensureHexRendered();let off=0;if(t==='first-tkey'&&parser?.r.tables[0])off=parser.r.tables[0].tkeyOff||0;else if(t==='first-tdat'&&parser?.r.tables[0])off=parser.r.tables[0].tdatOff||0;scrollToOffset(off);}
+function hexNavAddr(){ensureHexRendered();const v=document.getElementById('hexAddrInput').value.trim();const off=parseInt(v,16);if(!isNaN(off))scrollToOffset(off);}
+function scrollToOffset(off){ensureHexRendered();const body=document.getElementById('hexBody');const ln=Math.floor(off/16);body.scrollTop=ln*HEX_LINE_H-body.clientHeight/2;if(body._renderHex)body._renderHex();}
+function goToHex(off){document.querySelector('[data-tab="hex"]').click();setTimeout(()=>scrollToOffset(off),100);}
+
+// ========== SEARCH ==========
+const searchField=document.getElementById('searchField');
+const advToggle=document.getElementById('advToggle');
+const histToggle=document.getElementById('histToggle');
+advToggle.addEventListener('click',()=>{advToggle.classList.toggle('on');document.getElementById('searchAdv').classList.toggle('open');document.getElementById('searchHistory').classList.remove('open');histToggle.classList.remove('on');});
+histToggle.addEventListener('click',()=>{histToggle.classList.toggle('on');document.getElementById('searchHistory').classList.toggle('open');document.getElementById('searchAdv').classList.remove('open');advToggle.classList.remove('on');renderSearchHistory();});
+document.querySelectorAll('.adv-g').forEach(grp=>{grp.querySelectorAll('.adv-o').forEach(btn=>{btn.addEventListener('click',()=>{grp.querySelectorAll('.adv-o').forEach(b=>b.classList.remove('on'));btn.classList.add('on');applySearch();});});});
+document.getElementById('advTableFilter').addEventListener('change',applySearch);
+document.getElementById('advCase').addEventListener('change',applySearch);
+document.getElementById('advNegate').addEventListener('change',applySearch);
+['advOffFrom','advOffTo','advLenMin','advLenMax'].forEach(id=>{document.getElementById(id).addEventListener('input',applySearch);});
+searchField.addEventListener('input',applySearch);
+searchField.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(e.shiftKey)navMatch(-1);else navMatch(1);}if(e.key==='Escape'){searchField.value='';applySearch();searchField.blur();}});
+document.getElementById('searchPrev').addEventListener('click',()=>navMatch(-1));
+document.getElementById('searchNext').addEventListener('click',()=>navMatch(1));
+document.addEventListener('keydown',e=>{if(e.key==='/'&&!e.ctrlKey&&!e.metaKey&&document.activeElement!==searchField){e.preventDefault();searchField.focus();document.querySelector('[data-tab="entries"]').click();}if((e.ctrlKey||e.metaKey)&&e.key==='f'){e.preventDefault();searchField.focus();document.querySelector('[data-tab="entries"]').click();}});
+
+function getAdvState(){return{mode:document.querySelector('[data-adv="mode"] .adv-o.on')?.dataset.val||'contains',scope:document.querySelector('[data-adv="scope"] .adv-o.on')?.dataset.val||'all',token:document.querySelector('[data-adv="token"] .adv-o.on')?.dataset.val||'',tokenType:document.querySelector('[data-adv="tokentype"] .adv-o.on')?.dataset.val||'',caseSensitive:document.getElementById('advCase').checked,negate:document.getElementById('advNegate').checked,table:document.getElementById('advTableFilter').value,offFrom:parseInt(document.getElementById('advOffFrom').value,16),offTo:parseInt(document.getElementById('advOffTo').value,16),lenMin:parseInt(document.getElementById('advLenMin').value),lenMax:parseInt(document.getElementById('advLenMax').value)};}
+function buildMatcher(q,adv){if(!q)return null;const cs=adv.caseSensitive;const lq=cs?q:q.toLowerCase();try{if(adv.mode==='regex'){const re=new RegExp(q,cs?'':'i');return s=>re.test(s);}if(adv.mode==='exact')return s=>(cs?s:s.toLowerCase())===lq;if(adv.mode==='wildcard'){const pat='^'+q.replace(/[.+^${}()|[\]\\]/g,'\\$&').replace(/\*/g,'.*').replace(/\?/g,'.')+'$';const re=new RegExp(pat,cs?'':'i');return s=>re.test(s);}if(adv.mode==='fuzzy'){return s=>{const v=cs?s:s.toLowerCase();let qi=0;for(let i=0;i<v.length&&qi<lq.length;i++){if(v[i]===lq[qi])qi++;}return qi===lq.length;};}return s=>(cs?s:s.toLowerCase()).includes(lq);}catch{return s=>s.toLowerCase().includes(q.toLowerCase());}}
+function applySearch(){const q=searchField.value.trim();const adv=getAdvState();let f=[...allEntries];if(adv.table)f=f.filter(e=>e.table===adv.table);if(!isNaN(adv.offFrom))f=f.filter(e=>e.absOffset>=adv.offFrom);if(!isNaN(adv.offTo))f=f.filter(e=>e.absOffset<=adv.offTo);if(!isNaN(adv.lenMin))f=f.filter(e=>e.text.length>=adv.lenMin);if(!isNaN(adv.lenMax))f=f.filter(e=>e.text.length<=adv.lenMax);if(adv.token==='has'){if(adv.tokenType)f=f.filter(e=>e.text.includes(adv.tokenType));else f=f.filter(e=>/~[^~]+~/.test(e.text));}else if(adv.token==='none')f=f.filter(e=>!/~[^~]+~/.test(e.text));if(q){const matcher=buildMatcher(q,adv);if(matcher){if(adv.scope==='key')f=f.filter(e=>adv.negate?!matcher(e.key):matcher(e.key));else if(adv.scope==='text')f=f.filter(e=>adv.negate?!matcher(e.text):matcher(e.text));else f=f.filter(e=>adv.negate?(!matcher(e.key)&&!matcher(e.text)):(matcher(e.key)||matcher(e.text)));}if(q.length>=2&&!searchHistory.includes(q)){searchHistory.unshift(q);if(searchHistory.length>15)searchHistory.pop();}}filteredEntries=f;matchIndices=q?f.map((_,i)=>i):[];currentMatchIdx=q&&matchIndices.length?0:-1;document.getElementById('searchCount').textContent=q?`${matchIndices.length} 匹配`:`${f.length} 条`;document.getElementById('searchPrev').disabled=!q||!matchIndices.length;document.getElementById('searchNext').disabled=!q||!matchIndices.length;updateTable(f,q);if(currentMatchIdx>=0)highlightCurrentMatch();}
+function navMatch(dir){if(!matchIndices.length)return;currentMatchIdx=(currentMatchIdx+dir+matchIndices.length)%matchIndices.length;highlightCurrentMatch();}
+function highlightCurrentMatch(){const rows=document.querySelectorAll('#entriesBody tr');rows.forEach(r=>r.classList.remove('cur'));const ri=matchIndices[currentMatchIdx];if(ri<rows.length){rows[ri].classList.add('cur');rows[ri].scrollIntoView({behavior:'smooth',block:'center'});}document.getElementById('searchCount').textContent=`${currentMatchIdx+1} / ${matchIndices.length}`;}
+function renderSearchHistory(){const list=document.getElementById('shList');if(!searchHistory.length){list.innerHTML='<span style="color:var(--muted-foreground);font-size:0.72rem">暂无</span>';return;}list.innerHTML=searchHistory.map(q=>`<span class="hst-item" onclick="searchField.value='${parser.escHTML(q)}';applySearch();">${parser.escHTML(q)}</span>`).join('');}
+
+// ========== ENTRIES ==========
+// ========== VIRTUAL SCROLL TABLE ==========
+function renderEntries(entries){updateTable(entries);}
+function updateTable(entries,q=''){
+  const sorted=[...entries].sort((a,b)=>{let va=a[sortState.col],vb=b[sortState.col];if(typeof va==='string'){va=va.toLowerCase();vb=(vb||'').toLowerCase();}if(va<vb)return sortState.dir==='asc'?-1:1;if(va>vb)return sortState.dir==='asc'?1:-1;return 0;});
+  const matcher=q?buildMatcher(q,getAdvState()):null;
+  document.getElementById('entryInfo').textContent=sorted.length.toLocaleString()+' 条';
+  let html='';
+  for(const e of sorted){
+    let textHTML=hlTokens(parser.escHTML(e.text));
+    let keyHTML=parser.escHTML(e.key);
+    if(matcher){if(matcher(e.key))keyHTML=hlM(e.key,q);if(matcher(e.text))textHTML=hlMT(e.text,q);}
+    html+=`<tr data-t="${parser.escHTML(e.table)}" data-k="${parser.escHTML(e.key)}"><td class="td-tbl">${parser.escHTML(e.table)}</td><td class="td-key" onclick="copyText(this.textContent)">${keyHTML}</td><td class="td-off" onclick="goToHex(${e.absOffset})">0x${e.absOffset.toString(16).padStart(6,'0')}</td><td class="td-txt">${textHTML}</td><td class="td-act"><button class="btn btn-sm btn-primary" onclick="openFlow(this.closest('tr').dataset.t,this.closest('tr').dataset.k)" style="font-size:0.65rem;padding:0.18rem 0.35rem">▶ 解析</button></td></tr>`;
+  }
+  document.getElementById('entriesBody').innerHTML=html;
+}
+function hlM(s,q){const esc=parser.escHTML(s);try{return esc.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<span class="mh">$1</span>');}catch{return esc;}}
+function hlMT(s,q){let esc=hlTokens(parser.escHTML(s));try{return esc.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<span class="mh">$1</span>');}catch{return esc;}}
+function hlTokens(s){return s.replace(/~([^~]+)~/g,(m,i)=>{const cm={'r':'#ef4444','g':'#22c55e','b':'#3b82f6','w':'#e4e4e7','y':'#eab308','p':'#a855f7','o':'#f97316','n':'#06b6d4'};const c=cm[i.toLowerCase()];if(c&&i.length===1)return`<span class="tk"><span class="tk-c" style="background:${c}"></span>~${i}~</span>`;return`<span class="tk">~${i}~</span>`;});}
+function populateFilter(tables){const sel=document.getElementById('advTableFilter');sel.innerHTML='<option value="">全部子表</option>';for(const t of tables){const o=document.createElement('option');o.value=t.name;o.textContent=`${t.name}（${t.cnt}）`;sel.appendChild(o);}}
+document.querySelectorAll('thead th[data-sort]').forEach(th=>{th.addEventListener('click',()=>{const col=th.dataset.sort;document.querySelectorAll('thead th').forEach(t=>t.classList.remove('sorted','sorted-asc'));if(sortState.col===col)sortState.dir=sortState.dir==='asc'?'desc':'asc';else sortState={col,dir:'asc'};th.classList.add(sortState.dir==='asc'?'sorted-asc':'sorted');applySearch();});});
+
+// ========== FLOW ==========
+function openFlow(tableName,key){const entry=allEntries.find(e=>e.table===tableName&&e.key===key);if(!entry)return;flowSteps=buildFlowSteps(entry);flowCurrentStep=-1;flowPlaying=false;if(flowTimer){clearInterval(flowTimer);flowTimer=null;}document.getElementById('flowTitle').textContent=`解析流程: ${entry.table} / ${entry.key}`;renderFlowMap();renderFlowBytes();renderFlowExplain();document.getElementById('flowDecode').innerHTML='';document.getElementById('flowOverlay').classList.add('open');document.getElementById('flowStatus').textContent=`0 / ${flowSteps.length}`;setTimeout(()=>flowTogglePlay(),400);}
+function closeFlow(){document.getElementById('flowOverlay').classList.remove('open');flowPlaying=false;if(flowTimer){clearInterval(flowTimer);flowTimer=null;}}
+function buildFlowSteps(entry){const p=parser,d=p.d,tbl=p.r.tables.find(t=>t.name===entry.table);if(!tbl)return[];const isMain=entry.table==='MAIN',isVC=p.r.format==='vc',isIII=p.r.format==='iii';const entrySize=isVC?12:8;const steps=[];const mapBlocks=[];if(isVC||p.r.format==='sa'){const tablIdx=p.r.tables.indexOf(tbl);const off=8+tablIdx*12;steps.push({mapIdx:0,title:'在 TABL 中查找子表',desc:`TABL 记录了每个子表的名称和偏移地址。这是第 <b>${tablIdx}</b> 条，每条 12 字节。`,bytes:[{off,len:8,label:'表名',type:'name'},{off:off+8,len:4,label:'偏移',type:'offset'}],decode:{label:'查到',value:entry.table,formula:`偏移 → 0x${tbl.tkeyOff.toString(16).padStart(6,'0')}`}});mapBlocks.push({type:'t',label:'TABL'});}if(!isMain){steps.push({mapIdx:1,title:`跳转到 "${entry.table}"`,desc:`偏移量指向 <code>0x${tbl.tkeyOff.toString(16).padStart(6,'0')}</code>，先有 8 字节子表名称前缀。`,bytes:[{off:tbl.tkeyOff,len:8,label:'子表名',type:'name'}],decode:{label:'名称',value:`"${tbl.name}"`,formula:'ASCII 解码'}});mapBlocks.push({type:'n',label:entry.table});}const tkeyStart=tbl.tkeyOff;steps.push({mapIdx:mapBlocks.length,title:'读取 TKEY 块头',desc:`前 4 字节是魔术字 "TKEY"，后 4 字节是块大小（小端序）。`,bytes:[{off:tkeyStart,len:4,label:'"TKEY"',type:'header'},{off:tkeyStart+4,len:4,label:'块大小',type:'header'}],decode:{label:'TKEY',value:`${tbl.tkeySz} B`,formula:`${tbl.tkeySz} / ${entrySize} = ${tbl.cnt} 条`}});mapBlocks.push({type:'k',label:'TKEY'});const eo=tbl.tkeyOff+8+entry.idx*entrySize;steps.push({mapIdx:mapBlocks.length,title:`定位条目 #${entry.idx}`,desc:`数据区每条 ${entrySize} 字节，第 ${entry.idx} 条 = 起始 + ${entry.idx} × ${entrySize}。`,bytes:[{off:eo,len:entrySize,label:`#${entry.idx}`,type:'key'}],decode:{label:'地址',value:`0x${eo.toString(16).padStart(6,'0')}`,formula:`0x${(tbl.tkeyOff+8).toString(16)} + ${entry.idx}×${entrySize}`}});const relOff=p.u32(eo);steps.push({mapIdx:mapBlocks.length,title:'读取偏移量（前4字节）',desc:`小端序 uint32，低位在前，需反转拼接。`,bytes:[{off:eo,len:1,label:`0x${d[eo].toString(16).padStart(2,'0')}`,type:'offset'},{off:eo+1,len:1,label:`0x${d[eo+1].toString(16).padStart(2,'0')}`,type:'offset'},{off:eo+2,len:1,label:`0x${d[eo+2].toString(16).padStart(2,'0')}`,type:'offset'},{off:eo+3,len:1,label:`0x${d[eo+3].toString(16).padStart(2,'0')}`,type:'offset'}],decode:{label:'相对偏移',value:`${relOff}`,formula:`${d[eo].toString(16)} ${d[eo+1].toString(16)} ${d[eo+2].toString(16)} ${d[eo+3].toString(16)} → ${relOff}`}});const keyOff=eo+4;const keyLen=entrySize-4;const rawKey=Array.from(d.slice(keyOff,keyOff+keyLen));const keyCells=rawKey.map((b,i)=>({off:keyOff+i,len:1,label:b===0?'00':String.fromCharCode(b),type:b===0?'':'key'}));steps.push({mapIdx:mapBlocks.length,title:'读取键名',desc:`后续 ${keyLen} 字节是 ASCII 键名，00 填充。`,bytes:keyCells,decode:{label:'键名',value:`"${entry.key}"`,formula:`${rawKey.map(b=>b?'0x'+b.toString(16).padStart(2,'0'):'00').join(' ')} → "${entry.key}"`}});steps.push({mapIdx:mapBlocks.length,title:'定位 TDAT 块',desc:`TDAT 紧跟 TKEY，块头 8 字节。`,bytes:[{off:tbl.tdatOff,len:4,label:'"TDAT"',type:'header'},{off:tbl.tdatOff+4,len:4,label:'块大小',type:'header'}],decode:{label:'TDAT',value:`0x${tbl.tdatOff.toString(16).padStart(6,'0')}`,formula:`文本起始 = 0x${tbl.textBase.toString(16).padStart(6,'0')}`}});mapBlocks.push({type:'d',label:'TDAT'});const absOff=tbl.textBase+relOff;steps.push({mapIdx:mapBlocks.length,title:'计算绝对地址',desc:`TDAT 数据起始 + 相对偏移 = 文本在文件中的位置。`,bytes:[],decode:{label:'绝对地址',value:`0x${absOff.toString(16).padStart(6,'0')}`,formula:`0x${tbl.textBase.toString(16)} + 0x${relOff.toString(16)}`}});const textBytes=[];let ti=absOff;while(ti+1<d.length){const lo=d[ti],hi=d[ti+1];if(!lo&&!hi)break;textBytes.push(lo,hi);ti+=2;}const showB=Math.min(textBytes.length,24);const textCells=[];for(let i=0;i<showB;i+=2){textCells.push({off:absOff+i,len:2,label:String.fromCharCode(textBytes[i]|(textBytes[i+1]<<8)),type:'text'});}if(textBytes.length>showB)textCells.push({off:absOff+showB,len:2,label:'…',type:''});steps.push({mapIdx:mapBlocks.length,title:'解码 UTF-16LE 文本',desc:`每字符 2 字节，低位+高位×256，00 00 结束。`,bytes:textCells,decode:{label:'结果',value:`"${entry.text.substring(0,60)}${entry.text.length>60?'…':''}"`,formula:`${entry.text.length} 字符 · ${textBytes.length} 字节`}});steps.push({mapIdx:mapBlocks.length,title:'✅ 解析完成',desc:`键值对已从二进制中提取。`,bytes:[],decode:{label:'最终',value:`${entry.key} → "${entry.text.substring(0,80)}${entry.text.length>80?'…':''}"`,formula:`${entry.table} · #${entry.idx}`},isLast:true});steps._mapBlocks=mapBlocks;return steps;}
+function renderFlowMap(){const mapEl=document.getElementById('flowMap');const blocks=flowSteps._mapBlocks||[];mapEl.innerHTML=blocks.map((b,i)=>{const cls=b.type==='t'?'fm-t':b.type==='n'?'fm-n':b.type==='k'?'fm-k':'fm-d';return(i>0?'<span class="fm-arr">→</span>':'')+`<span class="fm ${cls}" data-mi="${i}">${b.label}</span>`;}).join('');}
+function renderFlowBytes(){const container=document.getElementById('flowBytes');const cellMap=new Map();for(const s of flowSteps){if(!s.bytes)continue;for(const c of s.bytes){if(!cellMap.has(c.off))cellMap.set(c.off,{...c});}}const unique=[...cellMap.values()].sort((a,b)=>a.off-b.off);const lines=new Map();for(const c of unique){const la=Math.floor(c.off/16)*16;if(!lines.has(la))lines.set(la,[]);lines.get(la).push(c);}let html='';for(const[addr,cells]of lines){html+=`<div class="fb-row" data-addr="${addr}"><span class="fb-addr">${addr.toString(16).padStart(6,'0')}</span>`;const cm=new Map(cells.map(c=>[c.off,c]));for(let i=0;i<16;i++){const off=addr+i;if(off>=rawData.length)break;const b=rawData[off];const cell=cm.get(off);const lbl=cell?(cell.label||''):'';html+=`<div class="fb-cell"><span class="fb-hx" data-off="${off}" id="fb-${off}">${b.toString(16).padStart(2,'0')}</span>${lbl?`<span class="fb-lbl" data-off="${off}">${parser.escHTML(lbl)}</span>`:''}</div>`;}html+='</div>';}container.innerHTML=html;}
+function renderFlowExplain(){document.getElementById('flowExplain').innerHTML=flowSteps.map((s,i)=>`<div class="fe" id="fe-${i}" data-idx="${i}"><div class="fe-t"><span class="fe-n">${i+1}</span>${s.title}</div><div class="fe-d">${s.desc}</div></div>`).join('');}
+function flowStep(dir){const n=flowCurrentStep+dir;if(n<0||n>=flowSteps.length)return;flowCurrentStep=n;applyFlowStep();}
+function applyFlowStep(){const step=flowSteps[flowCurrentStep];if(!step)return;document.querySelectorAll('.fe').forEach((el,i)=>{el.classList.remove('act','ok');if(i===flowCurrentStep)el.classList.add('act');else if(i<flowCurrentStep)el.classList.add('ok');});const ae=document.getElementById('fe-'+flowCurrentStep);if(ae)ae.scrollIntoView({behavior:'smooth',block:'center'});document.querySelectorAll('.fm').forEach((el,i)=>{el.classList.remove('active','done');const mi=parseInt(el.dataset.mi);if(mi===step.mapIdx)el.classList.add('active');else if(mi<step.mapIdx)el.classList.add('done');});document.querySelectorAll('#flowBytes .fb-hx').forEach(el=>{el.classList.remove('act','ok');});document.querySelectorAll('#flowBytes .fb-lbl').forEach(el=>{el.classList.remove('act');el.style.opacity='0.25';});if(step.bytes){for(const cell of step.bytes){for(let o=cell.off;o<cell.off+cell.len;o++){const el=document.getElementById('fb-'+o);if(el)el.classList.add('act');const lbl=document.querySelector(`.fb-lbl[data-off="${o}"]`);if(lbl){lbl.classList.add('act');lbl.style.opacity='1';}}}const fo=step.bytes[0]?.off;if(fo!==undefined){const cel=document.getElementById('fb-'+fo);if(cel)cel.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}}for(let i=0;i<flowCurrentStep;i++){const ps=flowSteps[i];if(ps.bytes){for(const cell of ps.bytes){for(let o=cell.off;o<cell.off+cell.len;o++){const el=document.getElementById('fb-'+o);if(el&&!el.classList.contains('act'))el.classList.add('ok');}}}}const de=document.getElementById('flowDecode');if(step.decode)de.innerHTML=`<span class="fd-l">${step.decode.label}:</span><span class="fd-b">${step.decode.formula||''}</span><span class="fd-arr">→</span><span class="fd-v">${step.decode.value}</span>`;else de.innerHTML='';document.getElementById('flowStatus').textContent=`${flowCurrentStep+1} / ${flowSteps.length}`;}
+function flowTogglePlay(){flowPlaying=!flowPlaying;const btn=document.getElementById('flowPlayBtn');if(flowPlaying){btn.textContent='⏸ 暂停';if(flowCurrentStep>=flowSteps.length-1){flowCurrentStep=-1;document.querySelectorAll('#flowBytes .fb-hx').forEach(el=>{el.classList.remove('act','ok');});document.querySelectorAll('#flowBytes .fb-lbl').forEach(el=>{el.classList.remove('act');el.style.opacity='0.25';});}flowTimer=setInterval(()=>{if(flowCurrentStep>=flowSteps.length-1){flowPlaying=false;btn.textContent='▶ 播放';clearInterval(flowTimer);flowTimer=null;return;}flowStep(1);},flowSpeed);}else{btn.textContent='▶ 播放';if(flowTimer){clearInterval(flowTimer);flowTimer=null;}}}
+document.querySelectorAll('.fsp b').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.fsp b').forEach(b=>b.classList.remove('on'));btn.classList.add('on');flowSpeed=parseInt(btn.dataset.fs);if(flowPlaying){clearInterval(flowTimer);flowTimer=setInterval(()=>{if(flowCurrentStep>=flowSteps.length-1){flowPlaying=false;document.getElementById('flowPlayBtn').textContent='▶ 播放';clearInterval(flowTimer);flowTimer=null;return;}flowStep(1);},flowSpeed);}});});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('flowOverlay').classList.contains('open'))closeFlow();});
+document.getElementById('flowOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('flowOverlay'))closeFlow();});
+
+// ========== STRUCTURE ==========
+function renderStructure(tables){const list=document.getElementById('structList');const frag=document.createDocumentFragment();tables.forEach((t,i)=>{const d=document.createElement('div');d.className='si'+(i===0?' active':'');d.dataset.idx=i;d.innerHTML=`<span class="si-n">${t.name}</span><span class="si-c">${t.cnt}</span>`;d.onclick=()=>{list.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));d.classList.add('active');showStructDetail(tables[i]);};frag.appendChild(d);});list.innerHTML='';list.appendChild(frag);if(tables.length)showStructDetail(tables[0]);}
+function showStructDetail(tbl){const d=document.getElementById('structDetail');const meta=[{l:'TKEY',v:'0x'+(tbl.tkeyOff||0).toString(16).padStart(6,'0')},{l:'TDAT',v:'0x'+(tbl.tdatOff||0).toString(16).padStart(6,'0')},{l:'条目',v:tbl.cnt},{l:'TKEY',v:(tbl.tkeySz||0)+' B'},{l:'TDAT',v:(tbl.tdatSz||0)+' B'}];const entriesHtml=tbl.entries.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span><span class="rv">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem">▶</button></span></div>`).join('');d.innerHTML=`<div class="sd-h"><h3>${tbl.name}</h3><span class="sd-t">${tbl.name==='MAIN'?'主表':'子表'}</span></div><div class="sd-meta">${meta.map(m=>`<div class="md"><span class="ml">${m.l}</span><span class="mv">${m.v}</span></div>`).join('')}</div><div class="sd-search"><input type="text" placeholder="搜索…" oninput="filterStruct(this,'${tbl.name}')"></div><div class="sd-entries" id="sdEntries">${entriesHtml}</div>${tbl.cnt>300?`<div style="color:var(--muted-foreground);padding:0.5rem 0;font-size:0.72rem">… ${tbl.cnt-300} 条</div>`:''}`;}
+function filterStruct(input,tableName){const q=input.value.toLowerCase();const tbl=parser.r.tables.find(t=>t.name===tableName);if(!tbl)return;const f=q?tbl.entries.filter(e=>e.key.toLowerCase().includes(q)||e.text.toLowerCase().includes(q)):tbl.entries;document.getElementById('sdEntries').innerHTML=f.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span><span class="rv">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem">▶</button></span></div>`).join('');}
+
+// ========== STATS ==========
+function renderStatsPanel(){
+  if(!parser||!allEntries.length)return;
+  const el=document.getElementById('statsContent');
+  
+  // Basic counts
+  const totalEntries=allEntries.length;
+  const totalChars=allEntries.reduce((s,e)=>s+e.text.length,0);
+  const totalBytes=allEntries.reduce((s,e)=>s+e.text.length*2,0);
+  const avgLen=Math.round(totalChars/totalEntries);
+  
+  // Token analysis
+  const tokenRe=/~([^~]+)~/g;
+  const tokenCounts={};
+  let entriesWithTokens=0;
+  for(const e of allEntries){
+    let hasToken=false;
+    let m;
+    while((m=tokenRe.exec(e.text))!==null){
+      const tok=m[1];
+      tokenCounts[tok]=(tokenCounts[tok]||0)+1;
+      hasToken=true;
+    }
+    if(hasToken)entriesWithTokens++;
+    tokenRe.lastIndex=0;
+  }
+  const sortedTokens=Object.entries(tokenCounts).sort((a,b)=>b[1]-a[1]);
+  
+  // Table stats
+  const tableStats=parser.r.tables.map(t=>({
+    name:t.name,
+    count:t.cnt,
+    chars:t.entries.reduce((s,e)=>s+e.text.length,0),
+    avgLen:t.cnt?Math.round(t.entries.reduce((s,e)=>s+e.text.length,0)/t.cnt):0,
+    withTokens:t.entries.filter(e=>/~~[^~]+~~/.test(e.text)).length
+  })).sort((a,b)=>b.count-a.count);
+  
+  // Text length distribution
+  const lenBuckets=[0,0,0,0,0,0]; // 0-10, 11-30, 31-60, 61-100, 101-200, 200+
+  for(const e of allEntries){
+    const l=e.text.length;
+    if(l<=10)lenBuckets[0]++;
+    else if(l<=30)lenBuckets[1]++;
+    else if(l<=60)lenBuckets[2]++;
+    else if(l<=100)lenBuckets[3]++;
+    else if(l<=200)lenBuckets[4]++;
+    else lenBuckets[5]++;
+  }
+  const maxBucket=Math.max(...lenBuckets);
+  
+  // Longest entries
+  const longest=[...allEntries].sort((a,b)=>b.text.length-a.text.length).slice(0,10);
+  
+  // Shortest non-empty
+  const shortest=[...allEntries].filter(e=>e.text.length>0).sort((a,b)=>a.text.length-b.text.length).slice(0,10);
+  
+  // Encoding info
+  const encoding=parser.r.format==='sa'?(parser.r.bits===16?'UTF-16LE (SA/IV 16bit)':'UTF-8 / GBK / Win-1252 (SA/IV 8bit, 智能检测)'):'UTF-16LE';
+  
+  el.innerHTML=`
+    <div class="stats">
+      <div class="stat"><div class="sl">总条目</div><div class="sv">${totalEntries.toLocaleString()}</div></div>
+      <div class="stat"><div class="sl">总字符数</div><div class="sv">${totalChars.toLocaleString()}</div></div>
+      <div class="stat"><div class="sl">平均长度</div><div class="sv">${avgLen} 字符</div></div>
+      <div class="stat"><div class="sl">含 Token</div><div class="sv">${entriesWithTokens.toLocaleString()} (${(entriesWithTokens/totalEntries*100).toFixed(1)}%)</div></div>
+      <div class="stat"><div class="sl">编码</div><div class="sv" style="font-size:0.75rem">${encoding}</div></div>
+    </div>
+
+    <!-- Token -->
+    <div class="card" style="margin:1rem 0">
+      <div class="card-header"><h3>Token 使用统计</h3><span style="color:var(--muted-foreground);font-size:0.72rem">共 ${sortedTokens.length} 种 Token</span></div>
+      <div class="card-body" style="max-height:320px;overflow-y:auto">
+        ${sortedTokens.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.4rem">
+          ${sortedTokens.map(([tok,cnt])=>{
+            const colorMap={'r':'#ef4444','g':'#22c55e','b':'#3b82f6','w':'#e4e4e7','y':'#eab308','p':'#a855f7','o':'#f97316','n':'#06b6d4'};
+            const c=colorMap[tok.toLowerCase()];
+            const pct=(cnt/totalEntries*100).toFixed(1);
+            return `<div style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0.5rem;background:var(--muted);border-radius:0.5rem">
+              ${c?`<span style="display:inline-block;width:0.8em;height:0.8em;border-radius:2px;background:${c};flex-shrink:0"></span>`:''}
+              <span style="font-family:var(--font-mono);font-size:0.78rem;font-weight:600;color:var(--foreground);min-width:3rem">~${tok}~</span>
+              <span style="color:var(--muted-foreground);font-size:0.72rem">${cnt} 次</span>
+              <span style="color:var(--muted-foreground);font-size:0.65rem">(${pct}%)</span>
+            </div>`;
+          }).join('')}
+        </div>`:'<p style="color:var(--muted-foreground);font-size:0.82rem">未发现 Token</p>'}
+      </div>
+    </div>
+
+    <!-- Length distribution -->
+    <div class="card" style="margin:1rem 0">
+      <div class="card-header"><h3>文本长度分布</h3></div>
+      <div class="card-body">
+        ${['0-10','11-30','31-60','61-100','101-200','200+'].map((label,i)=>{
+          const cnt=lenBuckets[i];
+          const pct=maxBucket?cnt/maxBucket*100:0;
+          return `<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem">
+            <span style="font-size:0.72rem;color:var(--muted-foreground);min-width:4.5rem;text-align:right">${label}</span>
+            <div style="flex:1;height:1.2rem;background:var(--muted);border-radius:0.3rem;overflow:hidden;position:relative">
+              <div style="height:100%;width:${pct}%;background:var(--primary);border-radius:0.3rem;transition:width 0.3s"></div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--muted-foreground);min-width:3.5rem">${cnt.toLocaleString()}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Table stats -->
+    <div class="card" style="margin:1rem 0">
+      <div class="card-header"><h3>子表统计</h3><span style="color:var(--muted-foreground);font-size:0.72rem">共 ${tableStats.length} 个子表</span></div>
+      <div class="tbl-wrap" style="max-height:400px;overflow-y:auto">
+        <table>
+          <thead><tr><th>子表</th><th>条目数</th><th>总字符</th><th>平均长度</th><th>占比</th></tr></thead>
+          <tbody>
+            ${tableStats.map(t=>`<tr>
+              <td class="td-tbl">${t.name}</td>
+              <td style="font-family:var(--font-mono)">${t.count.toLocaleString()}</td>
+              <td style="font-family:var(--font-mono)">${t.chars.toLocaleString()}</td>
+              <td style="font-family:var(--font-mono)">${t.avgLen}</td>
+              <td style="font-family:var(--font-mono)">${(t.count/totalEntries*100).toFixed(1)}%</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Longest & Shortest -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin:1rem 0">
+      <div class="card">
+        <div class="card-header"><h3>最长文本 Top 10</h3></div>
+        <div class="card-body" style="max-height:300px;overflow-y:auto">
+          ${longest.map((e,i)=>`<div style="padding:0.3rem 0;border-bottom:1px solid rgba(39,39,42,0.3);font-size:0.78rem">
+            <div style="display:flex;justify-content:space-between;margin-bottom:0.1rem">
+              <span class="td-key" style="font-size:0.72rem" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span>
+              <span style="font-family:var(--font-mono);font-size:0.68rem;color:var(--muted-foreground)">${e.text.length} 字符</span>
+            </div>
+            <div style="color:var(--muted-foreground);font-size:0.72rem;word-break:break-all;max-height:2.5rem;overflow:hidden">${hlTokens(parser.escHTML(e.text.substring(0,200)))}${e.text.length>200?'…':''}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>最短文本 Top 10</h3></div>
+        <div class="card-body" style="max-height:300px;overflow-y:auto">
+          ${shortest.map((e,i)=>`<div style="padding:0.3rem 0;border-bottom:1px solid rgba(39,39,42,0.3);font-size:0.78rem">
+            <div style="display:flex;justify-content:space-between;margin-bottom:0.1rem">
+              <span class="td-key" style="font-size:0.72rem" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span>
+              <span style="font-family:var(--font-mono);font-size:0.68rem;color:var(--muted-foreground)">${e.text.length} 字符</span>
+            </div>
+            <div style="color:var(--muted-foreground);font-size:0.72rem">${hlTokens(parser.escHTML(e.text))}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ========== TABS ==========
+document.querySelectorAll('.tab').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('panel-'+btn.dataset.tab).classList.add('active');if(btn.dataset.tab==='hex')ensureHexRendered();if(btn.dataset.tab==='stats')renderStatsPanel();});});
+document.querySelectorAll('.sb').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');parseSpeed=parseInt(btn.dataset.speed);if(parseSpeed===0)parseSpeed=999999;});});
+document.querySelectorAll('.lf').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.lf').forEach(b=>b.classList.remove('on'));btn.classList.add('on');logFilter=btn.dataset.filter;document.querySelectorAll('.le').forEach(el=>{el.style.display=(logFilter==='all'||el.dataset.tag===logFilter)?'':'none';});});});
+
+// ========== UTILS ==========
+function copyText(t){try{navigator.clipboard?.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
+function copyAllVisible(){const rows=document.querySelectorAll('#entriesBody tr');const lines=[];rows.forEach(r=>{const cells=r.querySelectorAll('td');if(cells.length>=4)lines.push(`${cells[1].textContent}\t${cells[3].textContent}`);});try{navigator.clipboard?.writeText(lines.join('\n'));}catch(e){const ta=document.createElement('textarea');ta.value=lines.join('\n');document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
+function exportFiltered(){if(!filteredEntries.length)return;let csv='\uFEFF子表,键名,偏移,文本内容\n';for(const e of filteredEntries)csv+=`"${e.table}","${e.key}","0x${e.absOffset.toString(16)}","${e.text.replace(/"/g,'""')}"\n`;download('gxt_filtered.csv',csv,'text/csv;charset=utf-8');}
+function exportJSON(){if(!parser)return;download('gxt_export.json',JSON.stringify({format:parser.r.format,tables:parser.r.tables.map(t=>({name:t.name,count:t.cnt,entries:t.entries.map(e=>({key:e.key,text:e.text}))}))},null,2),'application/json');}
+function exportCSV(){if(!parser)return;let csv='\uFEFF子表,键名,偏移,文本内容\n';for(const e of parser.r.entries)csv+=`"${e.table}","${e.key}","0x${e.absOffset.toString(16)}","${e.text.replace(/"/g,'""')}"\n`;download('gxt_export.csv',csv,'text/csv;charset=utf-8');}
+function exportFXT(){if(!parser)return;let fxt='';for(const t of parser.r.tables){if(parser.r.tables.length>1)fxt+=`[${t.name}]\n`;for(const e of t.entries)fxt+=`${e.key}\n${e.text}\n`;}download('gxt_export.fxt',fxt,'text/plain');}
+function download(name,content,type){
+  try{
+    const blob=new Blob([content],{type});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=name;a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},100);
+  }catch(e){
+    // Fallback: open in new tab
+    const w=window.open('','_blank');
+    w.document.write('<pre>'+content.replace(/</g,'&lt;')+'</pre>');
+    w.document.title=name;
+  }
+}
+</script>
+</body>
+</html>
