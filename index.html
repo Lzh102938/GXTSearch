@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GXT 文本解析器</title>
+<title>GXTSearch</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%236366f1'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='900' font-size='13' fill='white'>GXT</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -23,6 +24,34 @@
 }
 html{font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 body{background:var(--background);color:var(--foreground);font-family:var(--font-sans);line-height:1.6;min-height:100vh}
+
+/* Light theme */
+html.light{
+  --background:#ffffff;--foreground:#09090b;
+  --card:#ffffff;--card-foreground:#09090b;
+  --popover:#ffffff;--popover-foreground:#09090b;
+  --primary:#4f46e5;--primary-foreground:#fff;
+  --secondary:#f4f4f5;--secondary-foreground:#09090b;
+  --muted:#f4f4f5;--muted-foreground:#71717a;
+  --accent:#f4f4f5;--accent-foreground:#09090b;
+  --destructive:#fee2e2;--border:#e4e4e7;--input:#e4e4e7;--ring:#6366f1;
+}
+html.light .hx-b{color:#52525b}
+html.light .hx-addr{color:#a1a1aa}
+html.light .td-key{color:#16a34a}
+html.light .td-tbl{color:#7c3aed}
+html.light .td-txt{color:#18181b}
+html.light .tk{background:rgba(79,70,229,0.08);color:#4f46e5}
+html.light .mh{background:rgba(79,70,229,0.15);color:#4338ca}
+html.light tbody tr:hover{background:rgba(79,70,229,0.04)}
+html.light tbody tr.cur{background:rgba(79,70,229,0.06)}
+html.light .fe-d{color:#52525b}
+html.light .fe.act{background:rgba(79,70,229,0.04)}
+html.light .fd-b{color:#71717a}
+html.light .sd-r .rk{color:#16a34a}
+html.light .sd-r .rv{color:#18181b}
+html.light .fb-lbl{color:#a1a1aa}
+html.light .fb-lbl.act{color:#4f46e5}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#52525b}
 
 /* Layout */
@@ -281,13 +310,15 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
   <div style="max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;gap:0.8rem">
     <div style="width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.8rem;color:#fff;font-family:var(--font-mono)">GXT</div>
     <div>
-      <div style="font-weight:700;font-size:1rem">GXT 文本解析器</div>
-      <div style="color:var(--muted-foreground);font-size:0.72rem">GTA III / Vice City / San Andreas / IV · 文本文件分析工具</div>
+      <div style="font-weight:700;font-size:1rem">GXTSearch</div>
+      <div style="color:var(--muted-foreground);font-size:0.72rem">GTA III / Vice City / San Andreas / IV · GXT 文本解析工具</div>
     </div>
-    <div style="margin-left:auto;display:flex;gap:0.5rem">
+    <div style="margin-left:auto;display:flex;gap:0.5rem;align-items:center">
+      <span style="font-size:0.72rem;color:var(--muted-foreground);font-family:var(--font-mono)" id="visitCount"></span>
       <button class="btn" onclick="exportJSON()">导出 JSON</button>
       <button class="btn" onclick="exportCSV()">导出 CSV</button>
       <button class="btn" onclick="exportTXT()">导出 TXT</button>
+      <button class="btn" id="themeToggle" onclick="toggleTheme()" title="切换主题" style="padding:0.4rem 0.5rem;font-size:0.85rem">🌙</button>
     </div>
   </div>
 </header>
@@ -295,7 +326,7 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 <div class="page">
   <!-- Hero -->
   <div class="hero">
-    <h1>GXT 文本解析器</h1>
+    <h1>GXTSearch</h1>
     <p>解析 GTA III / Vice City / San Andreas / IV 的 GXT 文本文件，支持中文汉化版自动识别编码</p>
   </div>
 
@@ -406,7 +437,7 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
   <!-- Footer -->
   <div class="footer">
     <div class="footer-inner">
-      <p>© 2026 GXT 文本解析器</p>
+      <p>© 2026 GXTSearch</p>
       <div style="display:flex;gap:1rem">
         <a href="#">帮助</a>
       </div>
@@ -779,6 +810,35 @@ function renderStatsPanel(){
 document.querySelectorAll('.tab').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('panel-'+btn.dataset.tab).classList.add('active');if(btn.dataset.tab==='hex')ensureHexRendered();if(btn.dataset.tab==='stats')renderStatsPanel();});});
 document.querySelectorAll('.sb').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');parseSpeed=parseInt(btn.dataset.speed);if(parseSpeed===0)parseSpeed=999999;});});
 document.querySelectorAll('.lf').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.lf').forEach(b=>b.classList.remove('on'));btn.classList.add('on');logFilter=btn.dataset.filter;document.querySelectorAll('.le').forEach(el=>{el.style.display=(logFilter==='all'||el.dataset.tag===logFilter)?'':'none';});});});
+
+// ========== VISIT COUNT ==========
+(function(){
+  let count=parseInt(localStorage.getItem('gxt-visits')||'0')+1;
+  localStorage.setItem('gxt-visits',count.toString());
+  const el=document.getElementById('visitCount');
+  if(el)el.textContent=`${count} 次访问`;
+})();
+
+// ========== THEME ==========
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.classList.contains('dark');
+  html.classList.toggle('dark');
+  html.classList.toggle('light');
+  document.getElementById('themeToggle').textContent=isDark?'☀️':'🌙';
+  localStorage.setItem('gxt-theme',isDark?'light':'dark');
+}
+
+// Load saved theme
+(function(){
+  const saved=localStorage.getItem('gxt-theme');
+  if(saved==='light'){
+    document.documentElement.classList.remove('dark');
+    document.documentElement.classList.add('light');
+    const btn=document.getElementById('themeToggle');
+    if(btn)btn.textContent='☀️';
+  }
+})();
 
 // ========== UTILS ==========
 function copyText(t){try{navigator.clipboard?.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
