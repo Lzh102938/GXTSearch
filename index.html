@@ -10,49 +10,56 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --background:#09090b;--foreground:#fafafa;
-  --card:#09090b;--card-foreground:#fafafa;
-  --popover:#09090b;--popover-foreground:#fafafa;
+  --background:#0a0a0a;--foreground:#f5f5f5;
+  --card:#0a0a0a;--card-foreground:#f5f5f5;
+  --popover:#0a0a0a;--popover-foreground:#f5f5f5;
   --primary:#6366f1;--primary-foreground:#fff;
-  --secondary:#27272a;--secondary-foreground:#fafafa;
-  --muted:#27272a;--muted-foreground:#a1a1aa;
-  --accent:#27272a;--accent-foreground:#fafafa;
-  --destructive:#7f1d1d;--border:#27272a;--input:#27272a;--ring:#6366f1;
+  --secondary:#262626;--secondary-foreground:#f5f5f5;
+  --muted:#262626;--muted-foreground:#6b7280;
+  --accent:#262626;--accent-foreground:#f5f5f5;
+  --border:#262626;--input:#262626;--ring:#6366f1;
   --radius:1rem;
   --font-sans:'Inter',system-ui,-apple-system,sans-serif;
   --font-mono:'JetBrains Mono','Fira Code','Consolas',monospace;
+  --card-bg:linear-gradient(to bottom,#0a0a0a,rgba(23,23,23,0.9));
+  --card-border:rgba(38,38,38,0.5);
+  --card-border-hover:rgba(64,64,64,0.6);
+  --btn-border:rgba(38,38,38,0.6);
+  --btn-hover:#262626;--btn-hover-border:#404040;
+  --upload-border:#404040;
+  --scrollbar:#404040;--scrollbar-hover:#525252;
+  --shadow:0 20px 25px -5px rgba(0,0,0,0.25),0 8px 10px -6px rgba(0,0,0,0.15);
+  --link:#6366f1;
+  --green:#22c55e;--blue:#2563eb;--purple:#a855f7;--amber:#f59e0b;--red:#ef4444;--cyan:#06b6d4;
+}
+html.light{
+  --background:#ffffff;--foreground:#111827;
+  --card:#ffffff;--card-foreground:#111827;
+  --popover:#ffffff;--popover-foreground:#111827;
+  --primary:#6366f1;--primary-foreground:#fff;
+  --secondary:#f9fafb;--secondary-foreground:#111827;
+  --muted:#f9fafb;--muted-foreground:#6b7280;
+  --accent:#f9fafb;--accent-foreground:#111827;
+  --border:#e5e7eb;--input:#e5e7eb;--ring:#6366f1;
+  --card-bg:linear-gradient(to bottom,#ffffff,rgba(249,250,251,0.8));
+  --card-border:rgba(229,231,235,0.5);
+  --card-border-hover:rgba(209,213,219,0.6);
+  --btn-border:rgba(229,231,235,0.6);
+  --btn-hover:#f3f4f6;--btn-hover-border:#d1d5db;
+  --upload-border:#d1d5db;
+  --scrollbar:#d1d5db;--scrollbar-hover:#9ca3af;
+  --shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px -1px rgba(0,0,0,0.1);
+  --link:#4f46e5;
+  --green:#16a34a;--blue:#2563eb;--purple:#9333ea;--amber:#d97706;--red:#dc2626;--cyan:#0891b2;
 }
 html{font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 body{background:var(--background);color:var(--foreground);font-family:var(--font-sans);line-height:1.6;min-height:100vh}
 
-/* Light theme */
-html.light{
-  --background:#ffffff;--foreground:#09090b;
-  --card:#ffffff;--card-foreground:#09090b;
-  --popover:#ffffff;--popover-foreground:#09090b;
-  --primary:#4f46e5;--primary-foreground:#fff;
-  --secondary:#f4f4f5;--secondary-foreground:#09090b;
-  --muted:#f4f4f5;--muted-foreground:#71717a;
-  --accent:#f4f4f5;--accent-foreground:#09090b;
-  --destructive:#fee2e2;--border:#e4e4e7;--input:#e4e4e7;--ring:#6366f1;
-}
-html.light .hx-b{color:#52525b}
-html.light .hx-addr{color:#a1a1aa}
-html.light .td-key{color:#16a34a}
-html.light .td-tbl{color:#7c3aed}
-html.light .td-txt{color:#18181b}
-html.light .tk{background:rgba(79,70,229,0.08);color:#4f46e5}
-html.light .mh{background:rgba(79,70,229,0.15);color:#4338ca}
-html.light tbody tr:hover{background:rgba(79,70,229,0.04)}
-html.light tbody tr.cur{background:rgba(79,70,229,0.06)}
-html.light .fe-d{color:#52525b}
-html.light .fe.act{background:rgba(79,70,229,0.04)}
-html.light .fd-b{color:#71717a}
-html.light .sd-r .rk{color:#16a34a}
-html.light .sd-r .rv{color:#18181b}
-html.light .fb-lbl{color:#a1a1aa}
-html.light .fb-lbl.act{color:#4f46e5}
-::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#52525b}
+
+html.light .hx-b{color:#6b7280}
+html.light .hx-addr{color:#9ca3af}
+html.light .dark-only{display:none}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--scrollbar-hover)}
 
 /* Layout */
 .page{max-width:1200px;margin:0 auto;padding:0 1.5rem 3rem}
@@ -64,9 +71,9 @@ html.light .fb-lbl.act{color:#4f46e5}
 .hero p{color:var(--muted-foreground);font-size:0.85rem;margin-top:0.4rem}
 
 /* Upload */
-.upload{border:1px dashed #3f3f46;border-radius:var(--radius);padding:2rem;text-align:center;cursor:pointer;transition:all 0.3s ease-out;margin:1.5rem 0}
-.upload:hover{border-color:var(--primary);background:rgba(99,102,241,0.04)}
-.upload.has-file{padding:0.8rem 1.2rem;border-style:solid;border-color:rgba(39,39,42,0.6);display:flex;align-items:center;gap:0.8rem;text-align:left;background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px)}
+.upload{border:1px dashed var(--upload-border);border-radius:var(--radius);padding:2rem;text-align:center;cursor:pointer;transition:all 0.3s ease-out;margin:1.5rem 0}
+.upload:hover{border-color:var(--link);background:rgba(99,102,241,0.04)}
+.upload.has-file{padding:0.8rem 1.2rem;border-style:solid;border-color:var(--card-border);display:flex;align-items:center;gap:0.8rem;text-align:left;background:var(--card-bg);backdrop-filter:blur(20px)}
 .upload .icon{font-size:1.8rem;margin-bottom:0.5rem;opacity:0.4}
 .upload p{color:var(--muted-foreground);font-size:0.82rem}
 .upload input{display:none}
@@ -76,8 +83,8 @@ html.light .fb-lbl.act{color:#4f46e5}
 
 /* Stats */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;margin:1.5rem 0}
-.stat{background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);padding:0.8rem 1rem;transition:all 0.3s ease-out}
-.stat:hover{box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 8px 10px -6px rgba(0,0,0,0.1);transform:translateY(-2px);border-color:rgba(63,63,70,0.6)}
+.stat{background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--card-border);border-radius:var(--radius);padding:0.8rem 1rem;transition:all 0.3s ease-out}
+.stat:hover{box-shadow:var(--shadow);transform:translateY(-2px);border-color:var(--card-border-hover)}
 .stat .sl{font-size:0.68rem;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.15rem}
 .stat .sv{font-size:1.1rem;font-weight:700;font-family:var(--font-mono);color:var(--foreground)}
 
@@ -85,19 +92,20 @@ html.light .fb-lbl.act{color:#4f46e5}
 .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1rem;overflow-x:auto}
 .tab{background:none;border:none;color:var(--muted-foreground);padding:0.6rem 1rem;cursor:pointer;font-size:0.82rem;font-weight:500;border-bottom:2px solid transparent;transition:all 0.15s;font-family:var(--font-sans);white-space:nowrap}
 .tab:hover{color:var(--foreground)}.tab.active{color:var(--foreground);border-bottom-color:var(--primary)}
+.tab svg{opacity:0.6;vertical-align:-2px;margin-right:4px}.tab.active svg{opacity:1;color:var(--primary)}
 .panel{display:none}.panel.active{display:block}
 
 /* Card */
-.card{background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);overflow:hidden;transition:all 0.3s ease-out}
-.card:hover{border-color:rgba(63,63,70,0.6)}
+.card{background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden;transition:all 0.3s ease-out}
+.card:hover{border-color:var(--card-border-hover)}
 .card-header{padding:0.8rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap}
 .card-header h3{font-size:0.85rem;font-weight:600;flex:1}
 .card-body{padding:1rem}
 
 /* Button */
-.btn{display:inline-flex;align-items:center;gap:0.4rem;background:var(--secondary);border:1px solid rgba(39,39,42,0.6);color:var(--foreground);padding:0.45rem 0.9rem;border-radius:var(--radius);cursor:pointer;font-size:0.78rem;font-family:var(--font-sans);font-weight:500;transition:all 0.2s ease-out}
-.btn:hover{background:#3f3f46;border-color:#52525b}
-.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn{display:inline-flex;align-items:center;gap:0.4rem;background:var(--secondary);border:1px solid var(--btn-border);color:var(--foreground);padding:0.45rem 0.9rem;border-radius:var(--radius);cursor:pointer;font-size:0.78rem;font-family:var(--font-sans);font-weight:500;transition:all 0.2s ease-out}
+.btn:hover{background:var(--btn-hover);border-color:var(--btn-hover-border)}
+.btn-primary{background:var(--primary);border-color:var(--link);color:#fff}
 .btn-primary:hover{background:#4f46e5;border-color:#4f46e5}
 .btn-sm{padding:0.3rem 0.6rem;font-size:0.72rem;border-radius:0.6rem}
 
@@ -108,7 +116,7 @@ html.light .fb-lbl.act{color:#4f46e5}
 .select{background:var(--muted);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.6rem;color:var(--foreground);font-size:0.78rem;font-family:var(--font-sans);outline:none;cursor:pointer}
 
 /* Search */
-.search-box{display:flex;align-items:center;gap:0;border:1px solid rgba(39,39,42,0.6);border-radius:var(--radius);background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);overflow:hidden;padding:0 0.8rem;transition:border-color 0.2s ease-out}
+.search-box{display:flex;align-items:center;gap:0;border:1px solid var(--btn-border);border-radius:var(--radius);background:var(--card-bg);backdrop-filter:blur(20px);overflow:hidden;padding:0 0.8rem;transition:border-color 0.2s ease-out}
 .search-box:focus-within{border-color:var(--primary)}
 .search-box .si{color:var(--muted-foreground);font-size:0.85rem;flex-shrink:0}
 .search-box input{flex:1;background:none;border:none;color:var(--foreground);padding:0.6rem 0.6rem;font-size:0.85rem;font-family:var(--font-sans);outline:none}
@@ -138,25 +146,25 @@ html.light .fb-lbl.act{color:#4f46e5}
 .hst-title{font-size:0.68rem;color:var(--muted-foreground);margin-bottom:0.25rem;text-transform:uppercase;letter-spacing:0.04em}
 .hst-list{display:flex;gap:0.25rem;flex-wrap:wrap}
 .hst-item{background:var(--muted);border:1px solid var(--border);border-radius:4px;padding:0.15rem 0.45rem;font-size:0.7rem;color:var(--muted-foreground);cursor:pointer;font-family:var(--font-mono)}
-.hst-item:hover{color:var(--primary);border-color:var(--primary)}
+.hst-item:hover{color:var(--link);border-color:var(--primary)}
 
 /* Match highlight */
 .mh{background:rgba(99,102,241,0.2);color:#a5b4fc;padding:0 0.1rem;border-radius:2px}
 
 /* Table */
-.tbl-wrap{overflow-x:auto;overflow-y:auto;max-height:70vh;border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px)}
+.tbl-wrap{overflow-x:auto;overflow-y:auto;max-height:70vh;border:1px solid var(--card-border);border-radius:var(--radius);background:var(--card-bg);backdrop-filter:blur(20px)}
 table{width:100%;border-collapse:collapse}
 thead th{background:var(--muted);padding:0.5rem 0.7rem;text-align:left;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted-foreground);border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;position:sticky;top:0;z-index:2}
 thead th:hover{color:var(--foreground)}
 thead th.sorted::after{content:' ▾';color:var(--primary)}
 thead th.sorted-asc::after{content:' ▴';color:var(--primary)}
 tbody{contain:layout style paint}
-tbody td{padding:0.4rem 0.7rem;border-bottom:1px solid rgba(39,39,42,0.5);font-size:0.8rem;vertical-align:top}
+tbody td{padding:0.4rem 0.7rem;border-bottom:1px solid var(--card-border);font-size:0.8rem;vertical-align:top}
 tbody tr{content-visibility:auto;contain-intrinsic-size:auto 2.5rem}
 tbody tr:hover{background:rgba(99,102,241,0.04)}
 tbody tr:last-child td{border-bottom:none}
 tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--primary)}
-.td-tbl{font-family:var(--font-mono);color:#a78bfa;font-size:0.72rem;white-space:nowrap}
+.td-tbl{font-family:var(--font-mono);color:var(--purple);font-size:0.72rem;white-space:nowrap}
 .td-key{font-family:var(--font-mono);font-weight:600;color:#4ade80;white-space:nowrap;cursor:pointer}
 .td-key:hover{text-decoration:underline}
 .td-off{font-family:var(--font-mono);color:var(--muted-foreground);font-size:0.72rem;cursor:pointer}
@@ -178,15 +186,15 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 .progress{height:2px;background:var(--muted);border-radius:1px;overflow:hidden;margin-bottom:0.5rem}
 .progress .fill{height:100%;background:var(--primary);width:0;transition:width 0.08s}
 .progress-text{font-size:0.7rem;color:var(--muted-foreground);font-family:var(--font-mono);margin-bottom:0.5rem}
-.log{background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);padding:0.5rem 0.7rem;height:400px;overflow-y:auto;font-family:var(--font-mono);font-size:0.73rem;line-height:1.85}
+.log{background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--card-border);border-radius:var(--radius);padding:0.5rem 0.7rem;height:400px;overflow-y:auto;font-family:var(--font-mono);font-size:0.73rem;line-height:1.85}
 .le{display:flex;gap:0.5rem;align-items:flex-start}
 .le .ln{color:var(--muted-foreground);min-width:2rem;text-align:right;flex-shrink:0;opacity:0.4}
-.le .arr{color:var(--primary);flex-shrink:0;opacity:0.5}
+.le .arr{color:var(--link);flex-shrink:0;opacity:0.5}
 .le .msg{flex:1;word-break:break-all}
 .tag{display:inline-block;padding:0 0.3rem;border-radius:3px;font-size:0.62rem;font-weight:700;margin-right:0.25rem;vertical-align:middle}
 .tag-h{background:rgba(99,102,241,0.12);color:#818cf8}
-.tag-s{background:rgba(168,85,247,0.1);color:#c084fc}
-.tag-e{background:rgba(74,222,128,0.08);color:#4ade80}
+.tag-s{background:rgba(168,85,247,0.1);color:var(--purple)}
+.tag-e{background:rgba(34,197,94,0.08);color:var(--green)}
 .tag-i{background:rgba(161,161,170,0.1);color:var(--muted-foreground)}
 .tag-w{background:rgba(239,68,68,0.1);color:#f87171}
 .hv{color:#e4e4e7;background:rgba(255,255,255,0.04);padding:0 0.2rem;border-radius:2px}
@@ -196,36 +204,36 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 .hex-legend{display:flex;gap:0.5rem;flex-wrap:wrap}
 .hex-legend span{display:flex;align-items:center;gap:0.2rem;font-size:0.65rem;color:var(--muted-foreground)}
 .dot{width:7px;height:7px;border-radius:2px;flex-shrink:0}
-.dot-blue{background:rgba(99,102,241,0.5)}
-.dot-purple{background:rgba(168,85,247,0.4)}
-.dot-green{background:rgba(74,222,128,0.4)}
-.dot-amber{background:rgba(251,191,36,0.3)}
-.dot-red{background:rgba(239,68,68,0.3)}
-.dot-cyan{background:rgba(34,211,238,0.4)}
+.dot-blue{background:var(--primary)}
+.dot-purple{background:var(--purple)}
+.dot-green{background:var(--green)}
+.dot-amber{background:var(--amber)}
+.dot-red{background:var(--red)}
+.dot-cyan{background:var(--cyan)}
 .hex-nav{display:flex;gap:0.25rem;align-items:center;flex-wrap:wrap}
 .hex-nav button{background:var(--muted);border:1px solid var(--border);color:var(--muted-foreground);padding:0.2rem 0.4rem;border-radius:4px;cursor:pointer;font-size:0.7rem;font-family:var(--font-sans)}
 .hex-nav button:hover{color:var(--foreground)}
-.hex-nav input{width:6ch;background:var(--muted);border:1px solid var(--border);color:var(--primary);padding:0.2rem 0.3rem;border-radius:4px;font-family:var(--font-mono);font-size:0.7rem;text-align:center;outline:none}
+.hex-nav input{width:6ch;background:var(--muted);border:1px solid var(--border);color:var(--link);padding:0.2rem 0.3rem;border-radius:4px;font-family:var(--font-mono);font-size:0.7rem;text-align:center;outline:none}
 .hex-nav input:focus{border-color:var(--primary)}
 .hex-body{padding:0.5rem 0.7rem;font-family:var(--font-mono);font-size:0.72rem;line-height:1.85;overflow:auto;height:480px;contain:layout style paint}
 .hx-line{white-space:nowrap;height:1.85em;position:absolute}
 .hx-addr{color:var(--muted-foreground);min-width:6ch;margin-right:0.7ch;cursor:pointer}.hx-addr:hover{color:var(--primary)}
 .hx-bytes{display:inline}
 .hx-b{display:inline-block;width:2.4ch;text-align:center;margin-right:0.25ch;border-radius:2px;cursor:pointer;transition:background 0.08s}
-.hx-b:hover{background:#3f3f46!important}
+.hx-b:hover{background:var(--muted)!important}
 .hx-sep{display:inline-block;width:0.7ch}
 .hx-ascii{margin-left:0.8ch;color:var(--muted-foreground);letter-spacing:0.03em}
 .hx-ascii span{cursor:pointer}.hx-ascii span:hover{color:var(--foreground)}
-.hl-header{background:rgba(99,102,241,0.12);color:#818cf8}
-.hl-section{background:rgba(168,85,247,0.08);color:#c084fc}
-.hl-key{background:rgba(74,222,128,0.08);color:#4ade80}
-.hl-text{background:rgba(251,191,36,0.06);color:#fbbf24}
-.hl-offset{background:rgba(239,68,68,0.08);color:#f87171}
-.hl-name{background:rgba(34,211,238,0.08);color:#22d3ee}
+.hl-header{background:rgba(99,102,241,0.12);color:var(--primary)}
+.hl-section{background:rgba(168,85,247,0.08);color:var(--purple)}
+.hl-key{background:rgba(34,197,94,0.08);color:var(--green)}
+.hl-text{background:rgba(245,158,11,0.06);color:var(--amber)}
+.hl-offset{background:rgba(239,68,68,0.08);color:var(--red)}
+.hl-name{background:rgba(6,182,212,0.08);color:var(--cyan)}
 .hl-active{outline:1.5px solid var(--primary);outline-offset:-1px;z-index:1;position:relative}
 
 /* Tooltip */
-.ttip{position:fixed;background:#18181b;border:1px solid #3f3f46;color:var(--foreground);padding:0.35rem 0.55rem;border-radius:var(--radius);font-size:0.72rem;font-family:var(--font-mono);pointer-events:none;z-index:999;max-width:340px;box-shadow:0 4px 12px rgba(0,0,0,0.5);line-height:1.5;display:none;white-space:pre}
+.ttip{position:fixed;background:var(--card);border:1px solid var(--card-border);color:var(--foreground);padding:0.35rem 0.55rem;border-radius:var(--radius);font-size:0.72rem;font-family:var(--font-mono);pointer-events:none;z-index:999;max-width:340px;box-shadow:0 4px 12px rgba(0,0,0,0.5);line-height:1.5;display:none;white-space:pre}
 .ttip.show{display:block}
 
 /* Flow overlay */
@@ -238,10 +246,10 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 .flow-map{display:flex;gap:2px;padding:0.6rem 1rem;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;align-items:stretch}
 .fm{padding:0.25rem 0.5rem;border-radius:var(--radius);font-size:0.68rem;font-family:var(--font-mono);font-weight:600;white-space:nowrap;display:flex;align-items:center;border:1px solid transparent;transition:all 0.2s;flex-shrink:0}
 .fm.active{outline:2px solid var(--primary);outline-offset:1px;z-index:1}.fm.done{opacity:0.35}
-.fm-t{background:rgba(99,102,241,0.1);color:#818cf8;border-color:rgba(99,102,241,0.15)}
-.fm-n{background:rgba(34,211,238,0.08);color:#22d3ee;border-color:rgba(34,211,238,0.12)}
+.fm-t{background:rgba(99,102,241,0.1);color:var(--link);border-color:rgba(99,102,241,0.15)}
+.fm-n{background:rgba(6,182,212,0.08);color:var(--cyan);border-color:rgba(6,182,212,0.12)}
 .fm-k{background:rgba(168,85,247,0.1);color:#c084fc;border-color:rgba(168,85,247,0.15)}
-.fm-d{background:rgba(251,191,36,0.08);color:#fbbf24;border-color:rgba(251,191,36,0.12)}
+.fm-d{background:rgba(245,158,11,0.08);color:var(--amber);border-color:rgba(245,158,11,0.12)}
 .fm-arr{display:flex;align-items:center;color:var(--muted-foreground);font-size:0.6rem;padding:0 0.1rem;flex-shrink:0}
 .flow-bytes{padding:0.6rem 1rem;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
 .fb-row{display:flex;gap:0;align-items:flex-end;margin-bottom:0.1rem;min-width:min-content}
@@ -249,19 +257,19 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 .fb-cell{display:flex;flex-direction:column;align-items:center;min-width:2.4rem;margin-right:1px}
 .fb-hx{font-family:var(--font-mono);font-size:0.74rem;font-weight:600;padding:0.12rem 0.08rem;border-radius:3px;line-height:1.2;text-align:center;background:var(--secondary);color:var(--muted-foreground);transition:all 0.2s}
 .fb-hx.act{outline:2px solid var(--primary);outline-offset:1px;background:rgba(99,102,241,0.12);color:var(--foreground)}
-.fb-hx.ok{background:rgba(74,222,128,0.08);color:#4ade80}
-.fb-lbl{font-size:0.5rem;color:var(--muted-foreground);text-align:center;margin-top:1px;max-width:2.4rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.2;transition:all 0.2s}.fb-lbl.act{color:var(--primary);font-weight:600}
+.fb-hx.ok{background:rgba(34,197,94,0.08);color:var(--green)}
+.fb-lbl{font-size:0.5rem;color:var(--muted-foreground);text-align:center;margin-top:1px;max-width:2.4rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.2;transition:all 0.2s}.fb-lbl.act{color:var(--link);font-weight:600}
 .flow-decode{padding:0.45rem 1rem;background:rgba(99,102,241,0.04);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;min-height:2rem}
 .fd-l{font-size:0.72rem;color:var(--muted-foreground);flex-shrink:0}
 .fd-v{font-family:var(--font-mono);font-size:0.85rem;color:var(--foreground);font-weight:700}
 .fd-arr{color:var(--muted-foreground);font-size:0.7rem}
 .fd-b{font-family:var(--font-mono);font-size:0.7rem;color:var(--muted-foreground);background:var(--muted);padding:0.12rem 0.35rem;border-radius:3px}
 .flow-exp{flex:1;overflow-y:auto;padding:0.5rem 1rem;min-height:0}
-.fe{padding:0.35rem 0;border-bottom:1px solid rgba(39,39,42,0.3);opacity:0.2;transition:all 0.2s}
+.fe{padding:0.35rem 0;border-bottom:1px solid var(--border);opacity:0.2;transition:all 0.2s}
 .fe.act{opacity:1;background:rgba(99,102,241,0.04);margin:0 -0.7rem;padding:0.35rem 0.7rem;border-radius:var(--radius)}.fe.ok{opacity:0.45}
 .fe-t{font-weight:600;font-size:0.8rem;margin-bottom:0.08rem;display:flex;align-items:center;gap:0.3rem}
 .fe-n{display:inline-flex;align-items:center;justify-content:center;width:1.3rem;height:1.3rem;border-radius:50%;background:var(--muted);color:var(--muted-foreground);font-size:0.6rem;font-family:var(--font-mono);flex-shrink:0}
-.fe.act .fe-n{background:var(--primary);color:#fff}.fe.ok .fe-n{background:#16a34a;color:#fff}
+.fe.act .fe-n{background:var(--primary);color:#fff}.fe.ok .fe-n{background:var(--green);color:#fff}
 .fe-d{font-size:0.78rem;color:var(--muted-foreground);line-height:1.5;padding-left:1.7rem}
 .flow-ctrl{display:flex;gap:0.35rem;align-items:center;padding:0.45rem 1rem;border-top:1px solid var(--border);background:var(--muted);flex-shrink:0;flex-wrap:wrap}
 .flow-ctrl button{background:var(--secondary);border:1px solid var(--border);color:var(--muted-foreground);padding:0.28rem 0.55rem;border-radius:var(--radius);cursor:pointer;font-size:0.72rem;font-family:var(--font-sans);transition:all 0.12s}.flow-ctrl button:hover{color:var(--foreground)}
@@ -272,11 +280,11 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 
 /* Structure */
 .struct-grid{display:grid;grid-template-columns:240px 1fr;gap:0.75rem;min-height:500px}
-.struct-list{background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);overflow-y:auto;max-height:560px}
-.si{padding:0.45rem 0.7rem;cursor:pointer;border-bottom:1px solid rgba(39,39,42,0.3);transition:all 0.08s;display:flex;justify-content:space-between;align-items:center;gap:0.4rem}
+.struct-list{background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--card-border);border-radius:var(--radius);overflow-y:auto;max-height:560px}
+.si{padding:0.45rem 0.7rem;cursor:pointer;border-bottom:1px solid var(--border);transition:all 0.08s;display:flex;justify-content:space-between;align-items:center;gap:0.4rem}
 .si:hover{background:var(--muted)}.si.active{background:rgba(99,102,241,0.06);border-left:3px solid var(--primary);padding-left:calc(0.7rem - 3px)}
 .si .si-n{font-family:var(--font-mono);font-size:0.78rem;font-weight:500}.si .si-c{font-size:0.65rem;color:var(--muted-foreground);font-family:var(--font-mono);background:var(--muted);padding:0.08rem 0.35rem;border-radius:3px}
-.struct-detail{background:linear-gradient(to bottom,#18181b,rgba(24,24,27,0.8));backdrop-filter:blur(20px);border:1px solid rgba(39,39,42,0.5);border-radius:var(--radius);padding:1rem;overflow-y:auto;max-height:560px}
+.struct-detail{background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--card-border);border-radius:var(--radius);padding:1rem;overflow-y:auto;max-height:560px}
 .sd-h{display:flex;align-items:baseline;gap:0.6rem;margin-bottom:0.2rem;flex-wrap:wrap}
 .sd-h h3{font-size:1rem;font-weight:700;font-family:var(--font-mono);color:var(--foreground)}
 .sd-h .sd-t{font-size:0.72rem;color:var(--muted-foreground);background:var(--muted);padding:0.12rem 0.35rem;border-radius:3px}
@@ -284,7 +292,7 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 .sd-meta .md{display:flex;flex-direction:column}.sd-meta .md .ml{font-size:0.6rem;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.04em}.sd-meta .md .mv{font-family:var(--font-mono);font-size:0.75rem;color:var(--muted-foreground)}
 .sd-search{margin-bottom:0.5rem}.sd-search input{width:100%;background:var(--muted);border:1px solid var(--border);border-radius:var(--radius);padding:0.35rem 0.5rem;color:var(--foreground);font-size:0.78rem;font-family:var(--font-sans);outline:none}.sd-search input:focus{border-color:var(--primary)}
 .sd-entries{max-height:340px;overflow-y:auto}
-.sd-r{display:grid;grid-template-columns:3ch minmax(8ch,14ch) 1fr auto;gap:0.5rem;padding:0.25rem 0.35rem;border-bottom:1px solid rgba(39,39,42,0.2);font-size:0.78rem;align-items:baseline}
+.sd-r{display:grid;grid-template-columns:3ch minmax(8ch,14ch) 1fr auto;gap:0.5rem;padding:0.25rem 0.35rem;border-bottom:1px solid var(--border);font-size:0.78rem;align-items:baseline}
 .sd-r:hover{background:rgba(99,102,241,0.04)}
 .sd-r .ri{color:var(--muted-foreground);font-family:var(--font-mono);font-size:0.65rem}
 .sd-r .rk{color:#4ade80;font-family:var(--font-mono);font-weight:500;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sd-r .rk:hover{text-decoration:underline}
@@ -304,6 +312,28 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 </style>
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="4" height="16" x="6" y="4"/><rect width="4" height="16" x="14" y="4"/></symbol>
+<symbol id="i-ch-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
+<symbol id="i-ch-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+<symbol id="i-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></symbol>
+<symbol id="i-hex" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></symbol>
+<symbol id="i-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M3 15h18"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m2 12 8.58 3.91a2 2 0 0 0 1.66 0L21 12"/><path d="m2 17 8.58 3.91a2 2 0 0 0 1.66 0L21 17"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></symbol>
+<symbol id="i-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></symbol>
+<symbol id="i-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></symbol>
+</svg>
 
 <!-- Header -->
 <header style="border-bottom:1px solid var(--border);padding:0.8rem 0;margin-bottom:0.5rem">
@@ -318,7 +348,7 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
       <button class="btn" onclick="exportJSON()">导出 JSON</button>
       <button class="btn" onclick="exportCSV()">导出 CSV</button>
       <button class="btn" onclick="exportTXT()">导出 TXT</button>
-      <button class="btn" id="themeToggle" onclick="toggleTheme()" title="切换主题" style="padding:0.4rem 0.5rem;font-size:0.85rem">🌙</button>
+      <button class="btn" id="themeToggle" onclick="toggleTheme()" title="切换主题" style="padding:0.4rem 0.5rem;font-size:0.85rem"><svg width="15" height="15" id="themeIcon"><use href="#i-moon"/></svg></button>
     </div>
   </div>
 </header>
@@ -332,7 +362,7 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 
   <!-- Upload -->
   <div class="upload" id="uploadZone">
-    <div class="icon">📂</div>
+    <div style="margin-bottom:0.5rem;opacity:0.4"><svg width="28" height="28"><use href="#i-folder"/></svg></div>
     <p>拖放 .gxt 文件到此处，或点击选择</p>
     <p style="font-size:0.72rem;opacity:0.4;margin-top:0.2rem">自动识别 III / VC / SA / IV 格式 · 支持 UTF-8 / GBK / Windows-1252 编码</p>
     <input type="file" id="fileInput" accept=".gxt,.txt,.fxt,.dat,.bin">
@@ -344,11 +374,11 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab active" data-tab="parse">解析日志</button>
-      <button class="tab" data-tab="hex">十六进制</button>
-      <button class="tab" data-tab="entries">文本条目</button>
-      <button class="tab" data-tab="structure">文件结构</button>
-      <button class="tab" data-tab="stats">文本统计</button>
+      <button class="tab active" data-tab="parse"><svg width="14" height="14" style="vertical-align:-2px;margin-right:4px;opacity:0.6"><use href="#i-terminal"/></svg>解析日志</button>
+      <button class="tab" data-tab="hex"><svg width="14" height="14" style="vertical-align:-2px;margin-right:4px;opacity:0.6"><use href="#i-hex"/></svg>十六进制</button>
+      <button class="tab" data-tab="entries"><svg width="14" height="14" style="vertical-align:-2px;margin-right:4px;opacity:0.6"><use href="#i-table"/></svg>文本条目</button>
+      <button class="tab" data-tab="structure"><svg width="14" height="14" style="vertical-align:-2px;margin-right:4px;opacity:0.6"><use href="#i-layers"/></svg>文件结构</button>
+      <button class="tab" data-tab="stats"><svg width="14" height="14" style="vertical-align:-2px;margin-right:4px;opacity:0.6"><use href="#i-chart"/></svg>文本统计</button>
     </div>
 
     <!-- Parse Log -->
@@ -390,13 +420,13 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
     <div class="panel" id="panel-entries">
       <div class="card" style="margin-bottom:0.8rem">
         <div class="search-box">
-          <span class="si">🔍</span>
+          <span style="display:flex;color:var(--muted-fg)"><svg width="16" height="16"><use href="#i-search"/></svg></span>
           <input type="text" id="searchField" placeholder="搜索键名或文本内容…" autocomplete="off">
           <div class="search-meta">
             <span class="search-count" id="searchCount"></span>
             <div class="search-nav"><button id="searchPrev" disabled>‹</button><button id="searchNext" disabled>›</button></div>
-            <button class="adv-toggle" id="advToggle" title="高级搜索">⚙</button>
-            <button class="adv-toggle" id="histToggle" title="搜索历史">🕐</button>
+            <button class="adv-toggle" id="advToggle" title="高级搜索"><svg width="14" height="14"><use href="#i-settings"/></svg></button>
+            <button class="adv-toggle" id="histToggle" title="搜索历史"><svg width="14" height="14"><use href="#i-clock"/></svg></button>
           </div>
         </div>
         <div class="adv-panel" id="searchAdv">
@@ -408,7 +438,7 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
         <div class="history-panel" id="searchHistory"><div class="hst-title">搜索历史</div><div class="hst-list" id="shList"></div></div>
         <div class="shortcut-bar"><span><kbd>/</kbd> 聚焦</span><span><kbd>Enter</kbd> 下一个</span><span><kbd>Shift+Enter</kbd> 上一个</span><span><kbd>Esc</kbd> 清除</span></div>
       </div>
-      <div class="ctrl-bar"><span class="entry-count" id="entryInfo"></span><button class="btn btn-sm btn-primary" onclick="copyAllVisible()">复制可见</button><button class="btn btn-sm" onclick="exportFiltered()">导出筛选</button></div>
+      <div class="ctrl-bar"><span class="entry-count" id="entryInfo"></span><button class="btn btn-sm btn-primary" onclick="copyAllVisible()"><svg width="12" height="12" style="vertical-align:-1px;margin-right:2px"><use href="#i-copy"/></svg>复制可见</button><button class="btn btn-sm" onclick="exportFiltered()"><svg width="12" height="12" style="vertical-align:-1px;margin-right:2px"><use href="#i-download"/></svg>导出筛选</button></div>
       <div class="tbl-wrap">
         <table><thead><tr><th data-sort="table">子表</th><th data-sort="key">键名</th><th data-sort="absOffset">偏移</th><th data-sort="text">文本内容</th><th>操作</th></tr></thead><tbody id="entriesBody"></tbody></table>
       </div>
@@ -420,7 +450,7 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
         <div class="struct-list" id="structList"></div>
         <div class="struct-detail" id="structDetail">
           <div style="text-align:center;padding:2.5rem;color:var(--muted-foreground)">
-            <div style="font-size:1.8rem;margin-bottom:0.5rem;opacity:0.3">📋</div>
+            <div style="font-size:1.8rem;margin-bottom:0.5rem;opacity:0.3"><svg width="28" height="28" style="opacity:0.3"><use href="#i-clipboard"/></svg></div>
             <p style="font-size:0.82rem">点击左侧子表查看条目</p>
           </div>
         </div>
@@ -448,15 +478,15 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 <!-- Flow Overlay -->
 <div class="flow-bg" id="flowOverlay">
   <div class="flow">
-    <div class="flow-hdr"><h3 id="flowTitle">解析流程</h3><button class="flow-x" onclick="closeFlow()">✕</button></div>
+    <div class="flow-hdr"><h3 id="flowTitle">解析流程</h3><button class="flow-x" onclick="closeFlow()"><svg width="16" height="16"><use href="#i-x"/></svg></button></div>
     <div class="flow-map" id="flowMap"></div>
     <div class="flow-bytes" id="flowBytes"></div>
     <div class="flow-decode" id="flowDecode"></div>
     <div class="flow-exp" id="flowExplain"></div>
     <div class="flow-ctrl">
-      <button onclick="flowStep(-1)">◀ 上一步</button>
-      <button onclick="flowTogglePlay()" id="flowPlayBtn">▶ 播放</button>
-      <button onclick="flowStep(1)">下一步 ▶</button>
+      <button onclick="flowStep(-1)"><svg width="13" height="13" style="vertical-align:-2px"><use href="#i-ch-left"/></svg> 上一步</button>
+      <button onclick="flowTogglePlay()" id="flowPlayBtn"><svg width="13" height="13" style="vertical-align:-2px"><use href="#i-play"/></svg> 播放</button>
+      <button onclick="flowStep(1)">下一步 <svg width="13" height="13" style="vertical-align:-2px"><use href="#i-ch-right"/></svg></button>
       <div class="fsp"><b data-fs="600">慢</b><b class="on" data-fs="250">中</b><b data-fs="100">快</b></div>
       <span class="fs-st" id="flowStatus">0 / 0</span>
     </div>
@@ -622,7 +652,7 @@ function updateTable(entries,q=''){
     let textHTML=hlTokens(parser.escHTML(e.text));
     let keyHTML=parser.escHTML(e.key);
     if(matcher){if(matcher(e.key))keyHTML=hlM(e.key,q);if(matcher(e.text))textHTML=hlMT(e.text,q);}
-    html+=`<tr data-t="${parser.escHTML(e.table)}" data-k="${parser.escHTML(e.key)}"><td class="td-tbl">${parser.escHTML(e.table)}</td><td class="td-key" onclick="copyText(this.textContent)">${keyHTML}</td><td class="td-off" onclick="goToHex(${e.absOffset})">0x${e.absOffset.toString(16).padStart(6,'0')}</td><td class="td-txt">${textHTML}</td><td class="td-act"><button class="btn btn-sm btn-primary" onclick="openFlow(this.closest('tr').dataset.t,this.closest('tr').dataset.k)" style="font-size:0.65rem;padding:0.18rem 0.35rem">▶ 解析</button></td></tr>`;
+    html+=`<tr data-t="${parser.escHTML(e.table)}" data-k="${parser.escHTML(e.key)}"><td class="td-tbl">${parser.escHTML(e.table)}</td><td class="td-key" onclick="copyText(this.textContent)">${keyHTML}</td><td class="td-off" onclick="goToHex(${e.absOffset})">0x${e.absOffset.toString(16).padStart(6,'0')}</td><td class="td-txt">${textHTML}</td><td class="td-act"><button class="btn btn-sm btn-primary" onclick="openFlow(this.closest('tr').dataset.t,this.closest('tr').dataset.k)" style="font-size:0.65rem;padding:0.18rem 0.35rem"><svg width="12" height="12" style="vertical-align:-1px"><use href="#i-play"/></svg> 解析</button></td></tr>`;
   }
   document.getElementById('entriesBody').innerHTML=html;
 }
@@ -635,21 +665,21 @@ document.querySelectorAll('thead th[data-sort]').forEach(th=>{th.addEventListene
 // ========== FLOW ==========
 function openFlow(tableName,key){const entry=allEntries.find(e=>e.table===tableName&&e.key===key);if(!entry)return;flowSteps=buildFlowSteps(entry);flowCurrentStep=-1;flowPlaying=false;if(flowTimer){clearInterval(flowTimer);flowTimer=null;}document.getElementById('flowTitle').textContent=`解析流程: ${entry.table} / ${entry.key}`;renderFlowMap();renderFlowBytes();renderFlowExplain();document.getElementById('flowDecode').innerHTML='';document.getElementById('flowOverlay').classList.add('open');document.getElementById('flowStatus').textContent=`0 / ${flowSteps.length}`;setTimeout(()=>flowTogglePlay(),400);}
 function closeFlow(){document.getElementById('flowOverlay').classList.remove('open');flowPlaying=false;if(flowTimer){clearInterval(flowTimer);flowTimer=null;}}
-function buildFlowSteps(entry){const p=parser,d=p.d,tbl=p.r.tables.find(t=>t.name===entry.table);if(!tbl)return[];const isMain=entry.table==='MAIN',isVC=p.r.format==='vc',isIII=p.r.format==='iii';const entrySize=isVC?12:8;const steps=[];const mapBlocks=[];if(isVC||p.r.format==='sa'){const tablIdx=p.r.tables.indexOf(tbl);const off=8+tablIdx*12;steps.push({mapIdx:0,title:'在 TABL 中查找子表',desc:`TABL 记录了每个子表的名称和偏移地址。这是第 <b>${tablIdx}</b> 条，每条 12 字节。`,bytes:[{off,len:8,label:'表名',type:'name'},{off:off+8,len:4,label:'偏移',type:'offset'}],decode:{label:'查到',value:entry.table,formula:`偏移 → 0x${tbl.tkeyOff.toString(16).padStart(6,'0')}`}});mapBlocks.push({type:'t',label:'TABL'});}if(!isMain){steps.push({mapIdx:1,title:`跳转到 "${entry.table}"`,desc:`偏移量指向 <code>0x${tbl.tkeyOff.toString(16).padStart(6,'0')}</code>，先有 8 字节子表名称前缀。`,bytes:[{off:tbl.tkeyOff,len:8,label:'子表名',type:'name'}],decode:{label:'名称',value:`"${tbl.name}"`,formula:'ASCII 解码'}});mapBlocks.push({type:'n',label:entry.table});}const tkeyStart=tbl.tkeyOff;steps.push({mapIdx:mapBlocks.length,title:'读取 TKEY 块头',desc:`前 4 字节是魔术字 "TKEY"，后 4 字节是块大小（小端序）。`,bytes:[{off:tkeyStart,len:4,label:'"TKEY"',type:'header'},{off:tkeyStart+4,len:4,label:'块大小',type:'header'}],decode:{label:'TKEY',value:`${tbl.tkeySz} B`,formula:`${tbl.tkeySz} / ${entrySize} = ${tbl.cnt} 条`}});mapBlocks.push({type:'k',label:'TKEY'});const eo=tbl.tkeyOff+8+entry.idx*entrySize;steps.push({mapIdx:mapBlocks.length,title:`定位条目 #${entry.idx}`,desc:`数据区每条 ${entrySize} 字节，第 ${entry.idx} 条 = 起始 + ${entry.idx} × ${entrySize}。`,bytes:[{off:eo,len:entrySize,label:`#${entry.idx}`,type:'key'}],decode:{label:'地址',value:`0x${eo.toString(16).padStart(6,'0')}`,formula:`0x${(tbl.tkeyOff+8).toString(16)} + ${entry.idx}×${entrySize}`}});const relOff=p.u32(eo);steps.push({mapIdx:mapBlocks.length,title:'读取偏移量（前4字节）',desc:`小端序 uint32，低位在前，需反转拼接。`,bytes:[{off:eo,len:1,label:`0x${d[eo].toString(16).padStart(2,'0')}`,type:'offset'},{off:eo+1,len:1,label:`0x${d[eo+1].toString(16).padStart(2,'0')}`,type:'offset'},{off:eo+2,len:1,label:`0x${d[eo+2].toString(16).padStart(2,'0')}`,type:'offset'},{off:eo+3,len:1,label:`0x${d[eo+3].toString(16).padStart(2,'0')}`,type:'offset'}],decode:{label:'相对偏移',value:`${relOff}`,formula:`${d[eo].toString(16)} ${d[eo+1].toString(16)} ${d[eo+2].toString(16)} ${d[eo+3].toString(16)} → ${relOff}`}});const keyOff=eo+4;const keyLen=entrySize-4;const rawKey=Array.from(d.slice(keyOff,keyOff+keyLen));const keyCells=rawKey.map((b,i)=>({off:keyOff+i,len:1,label:b===0?'00':String.fromCharCode(b),type:b===0?'':'key'}));steps.push({mapIdx:mapBlocks.length,title:'读取键名',desc:`后续 ${keyLen} 字节是 ASCII 键名，00 填充。`,bytes:keyCells,decode:{label:'键名',value:`"${entry.key}"`,formula:`${rawKey.map(b=>b?'0x'+b.toString(16).padStart(2,'0'):'00').join(' ')} → "${entry.key}"`}});steps.push({mapIdx:mapBlocks.length,title:'定位 TDAT 块',desc:`TDAT 紧跟 TKEY，块头 8 字节。`,bytes:[{off:tbl.tdatOff,len:4,label:'"TDAT"',type:'header'},{off:tbl.tdatOff+4,len:4,label:'块大小',type:'header'}],decode:{label:'TDAT',value:`0x${tbl.tdatOff.toString(16).padStart(6,'0')}`,formula:`文本起始 = 0x${tbl.textBase.toString(16).padStart(6,'0')}`}});mapBlocks.push({type:'d',label:'TDAT'});const absOff=tbl.textBase+relOff;steps.push({mapIdx:mapBlocks.length,title:'计算绝对地址',desc:`TDAT 数据起始 + 相对偏移 = 文本在文件中的位置。`,bytes:[],decode:{label:'绝对地址',value:`0x${absOff.toString(16).padStart(6,'0')}`,formula:`0x${tbl.textBase.toString(16)} + 0x${relOff.toString(16)}`}});const textBytes=[];let ti=absOff;while(ti+1<d.length){const lo=d[ti],hi=d[ti+1];if(!lo&&!hi)break;textBytes.push(lo,hi);ti+=2;}const showB=Math.min(textBytes.length,24);const textCells=[];for(let i=0;i<showB;i+=2){textCells.push({off:absOff+i,len:2,label:String.fromCharCode(textBytes[i]|(textBytes[i+1]<<8)),type:'text'});}if(textBytes.length>showB)textCells.push({off:absOff+showB,len:2,label:'…',type:''});steps.push({mapIdx:mapBlocks.length,title:'解码 UTF-16LE 文本',desc:`每字符 2 字节，低位+高位×256，00 00 结束。`,bytes:textCells,decode:{label:'结果',value:`"${entry.text.substring(0,60)}${entry.text.length>60?'…':''}"`,formula:`${entry.text.length} 字符 · ${textBytes.length} 字节`}});steps.push({mapIdx:mapBlocks.length,title:'✅ 解析完成',desc:`键值对已从二进制中提取。`,bytes:[],decode:{label:'最终',value:`${entry.key} → "${entry.text.substring(0,80)}${entry.text.length>80?'…':''}"`,formula:`${entry.table} · #${entry.idx}`},isLast:true});steps._mapBlocks=mapBlocks;return steps;}
+function buildFlowSteps(entry){const p=parser,d=p.d,tbl=p.r.tables.find(t=>t.name===entry.table);if(!tbl)return[];const isMain=entry.table==='MAIN',isVC=p.r.format==='vc',isIII=p.r.format==='iii';const entrySize=isVC?12:8;const steps=[];const mapBlocks=[];if(isVC||p.r.format==='sa'){const tablIdx=p.r.tables.indexOf(tbl);const off=8+tablIdx*12;steps.push({mapIdx:0,title:'在 TABL 中查找子表',desc:`TABL 记录了每个子表的名称和偏移地址。这是第 <b>${tablIdx}</b> 条，每条 12 字节。`,bytes:[{off,len:8,label:'表名',type:'name'},{off:off+8,len:4,label:'偏移',type:'offset'}],decode:{label:'查到',value:entry.table,formula:`偏移 → 0x${tbl.tkeyOff.toString(16).padStart(6,'0')}`}});mapBlocks.push({type:'t',label:'TABL'});}if(!isMain){steps.push({mapIdx:1,title:`跳转到 "${entry.table}"`,desc:`偏移量指向 <code>0x${tbl.tkeyOff.toString(16).padStart(6,'0')}</code>，先有 8 字节子表名称前缀。`,bytes:[{off:tbl.tkeyOff,len:8,label:'子表名',type:'name'}],decode:{label:'名称',value:`"${tbl.name}"`,formula:'ASCII 解码'}});mapBlocks.push({type:'n',label:entry.table});}const tkeyStart=tbl.tkeyOff;steps.push({mapIdx:mapBlocks.length,title:'读取 TKEY 块头',desc:`前 4 字节是魔术字 "TKEY"，后 4 字节是块大小（小端序）。`,bytes:[{off:tkeyStart,len:4,label:'"TKEY"',type:'header'},{off:tkeyStart+4,len:4,label:'块大小',type:'header'}],decode:{label:'TKEY',value:`${tbl.tkeySz} B`,formula:`${tbl.tkeySz} / ${entrySize} = ${tbl.cnt} 条`}});mapBlocks.push({type:'k',label:'TKEY'});const eo=tbl.tkeyOff+8+entry.idx*entrySize;steps.push({mapIdx:mapBlocks.length,title:`定位条目 #${entry.idx}`,desc:`数据区每条 ${entrySize} 字节，第 ${entry.idx} 条 = 起始 + ${entry.idx} × ${entrySize}。`,bytes:[{off:eo,len:entrySize,label:`#${entry.idx}`,type:'key'}],decode:{label:'地址',value:`0x${eo.toString(16).padStart(6,'0')}`,formula:`0x${(tbl.tkeyOff+8).toString(16)} + ${entry.idx}×${entrySize}`}});const relOff=p.u32(eo);steps.push({mapIdx:mapBlocks.length,title:'读取偏移量（前4字节）',desc:`小端序 uint32，低位在前，需反转拼接。`,bytes:[{off:eo,len:1,label:`0x${d[eo].toString(16).padStart(2,'0')}`,type:'offset'},{off:eo+1,len:1,label:`0x${d[eo+1].toString(16).padStart(2,'0')}`,type:'offset'},{off:eo+2,len:1,label:`0x${d[eo+2].toString(16).padStart(2,'0')}`,type:'offset'},{off:eo+3,len:1,label:`0x${d[eo+3].toString(16).padStart(2,'0')}`,type:'offset'}],decode:{label:'相对偏移',value:`${relOff}`,formula:`${d[eo].toString(16)} ${d[eo+1].toString(16)} ${d[eo+2].toString(16)} ${d[eo+3].toString(16)} → ${relOff}`}});const keyOff=eo+4;const keyLen=entrySize-4;const rawKey=Array.from(d.slice(keyOff,keyOff+keyLen));const keyCells=rawKey.map((b,i)=>({off:keyOff+i,len:1,label:b===0?'00':String.fromCharCode(b),type:b===0?'':'key'}));steps.push({mapIdx:mapBlocks.length,title:'读取键名',desc:`后续 ${keyLen} 字节是 ASCII 键名，00 填充。`,bytes:keyCells,decode:{label:'键名',value:`"${entry.key}"`,formula:`${rawKey.map(b=>b?'0x'+b.toString(16).padStart(2,'0'):'00').join(' ')} → "${entry.key}"`}});steps.push({mapIdx:mapBlocks.length,title:'定位 TDAT 块',desc:`TDAT 紧跟 TKEY，块头 8 字节。`,bytes:[{off:tbl.tdatOff,len:4,label:'"TDAT"',type:'header'},{off:tbl.tdatOff+4,len:4,label:'块大小',type:'header'}],decode:{label:'TDAT',value:`0x${tbl.tdatOff.toString(16).padStart(6,'0')}`,formula:`文本起始 = 0x${tbl.textBase.toString(16).padStart(6,'0')}`}});mapBlocks.push({type:'d',label:'TDAT'});const absOff=tbl.textBase+relOff;steps.push({mapIdx:mapBlocks.length,title:'计算绝对地址',desc:`TDAT 数据起始 + 相对偏移 = 文本在文件中的位置。`,bytes:[],decode:{label:'绝对地址',value:`0x${absOff.toString(16).padStart(6,'0')}`,formula:`0x${tbl.textBase.toString(16)} + 0x${relOff.toString(16)}`}});const textBytes=[];let ti=absOff;while(ti+1<d.length){const lo=d[ti],hi=d[ti+1];if(!lo&&!hi)break;textBytes.push(lo,hi);ti+=2;}const showB=Math.min(textBytes.length,24);const textCells=[];for(let i=0;i<showB;i+=2){textCells.push({off:absOff+i,len:2,label:String.fromCharCode(textBytes[i]|(textBytes[i+1]<<8)),type:'text'});}if(textBytes.length>showB)textCells.push({off:absOff+showB,len:2,label:'…',type:''});steps.push({mapIdx:mapBlocks.length,title:'解码 UTF-16LE 文本',desc:`每字符 2 字节，低位+高位×256，00 00 结束。`,bytes:textCells,decode:{label:'结果',value:`"${entry.text.substring(0,60)}${entry.text.length>60?'…':''}"`,formula:`${entry.text.length} 字符 · ${textBytes.length} 字节`}});steps.push({mapIdx:mapBlocks.length,title:'\u2714 解析完成',desc:`键值对已从二进制中提取。`,bytes:[],decode:{label:'最终',value:`${entry.key} → "${entry.text.substring(0,80)}${entry.text.length>80?'…':''}"`,formula:`${entry.table} · #${entry.idx}`},isLast:true});steps._mapBlocks=mapBlocks;return steps;}
 function renderFlowMap(){const mapEl=document.getElementById('flowMap');const blocks=flowSteps._mapBlocks||[];mapEl.innerHTML=blocks.map((b,i)=>{const cls=b.type==='t'?'fm-t':b.type==='n'?'fm-n':b.type==='k'?'fm-k':'fm-d';return(i>0?'<span class="fm-arr">→</span>':'')+`<span class="fm ${cls}" data-mi="${i}">${b.label}</span>`;}).join('');}
 function renderFlowBytes(){const container=document.getElementById('flowBytes');const cellMap=new Map();for(const s of flowSteps){if(!s.bytes)continue;for(const c of s.bytes){if(!cellMap.has(c.off))cellMap.set(c.off,{...c});}}const unique=[...cellMap.values()].sort((a,b)=>a.off-b.off);const lines=new Map();for(const c of unique){const la=Math.floor(c.off/16)*16;if(!lines.has(la))lines.set(la,[]);lines.get(la).push(c);}let html='';for(const[addr,cells]of lines){html+=`<div class="fb-row" data-addr="${addr}"><span class="fb-addr">${addr.toString(16).padStart(6,'0')}</span>`;const cm=new Map(cells.map(c=>[c.off,c]));for(let i=0;i<16;i++){const off=addr+i;if(off>=rawData.length)break;const b=rawData[off];const cell=cm.get(off);const lbl=cell?(cell.label||''):'';html+=`<div class="fb-cell"><span class="fb-hx" data-off="${off}" id="fb-${off}">${b.toString(16).padStart(2,'0')}</span>${lbl?`<span class="fb-lbl" data-off="${off}">${parser.escHTML(lbl)}</span>`:''}</div>`;}html+='</div>';}container.innerHTML=html;}
 function renderFlowExplain(){document.getElementById('flowExplain').innerHTML=flowSteps.map((s,i)=>`<div class="fe" id="fe-${i}" data-idx="${i}"><div class="fe-t"><span class="fe-n">${i+1}</span>${s.title}</div><div class="fe-d">${s.desc}</div></div>`).join('');}
 function flowStep(dir){const n=flowCurrentStep+dir;if(n<0||n>=flowSteps.length)return;flowCurrentStep=n;applyFlowStep();}
 function applyFlowStep(){const step=flowSteps[flowCurrentStep];if(!step)return;document.querySelectorAll('.fe').forEach((el,i)=>{el.classList.remove('act','ok');if(i===flowCurrentStep)el.classList.add('act');else if(i<flowCurrentStep)el.classList.add('ok');});const ae=document.getElementById('fe-'+flowCurrentStep);if(ae)ae.scrollIntoView({behavior:'smooth',block:'center'});document.querySelectorAll('.fm').forEach((el,i)=>{el.classList.remove('active','done');const mi=parseInt(el.dataset.mi);if(mi===step.mapIdx)el.classList.add('active');else if(mi<step.mapIdx)el.classList.add('done');});document.querySelectorAll('#flowBytes .fb-hx').forEach(el=>{el.classList.remove('act','ok');});document.querySelectorAll('#flowBytes .fb-lbl').forEach(el=>{el.classList.remove('act');el.style.opacity='0.25';});if(step.bytes){for(const cell of step.bytes){for(let o=cell.off;o<cell.off+cell.len;o++){const el=document.getElementById('fb-'+o);if(el)el.classList.add('act');const lbl=document.querySelector(`.fb-lbl[data-off="${o}"]`);if(lbl){lbl.classList.add('act');lbl.style.opacity='1';}}}const fo=step.bytes[0]?.off;if(fo!==undefined){const cel=document.getElementById('fb-'+fo);if(cel)cel.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}}for(let i=0;i<flowCurrentStep;i++){const ps=flowSteps[i];if(ps.bytes){for(const cell of ps.bytes){for(let o=cell.off;o<cell.off+cell.len;o++){const el=document.getElementById('fb-'+o);if(el&&!el.classList.contains('act'))el.classList.add('ok');}}}}const de=document.getElementById('flowDecode');if(step.decode)de.innerHTML=`<span class="fd-l">${step.decode.label}:</span><span class="fd-b">${step.decode.formula||''}</span><span class="fd-arr">→</span><span class="fd-v">${step.decode.value}</span>`;else de.innerHTML='';document.getElementById('flowStatus').textContent=`${flowCurrentStep+1} / ${flowSteps.length}`;}
-function flowTogglePlay(){flowPlaying=!flowPlaying;const btn=document.getElementById('flowPlayBtn');if(flowPlaying){btn.textContent='⏸ 暂停';if(flowCurrentStep>=flowSteps.length-1){flowCurrentStep=-1;document.querySelectorAll('#flowBytes .fb-hx').forEach(el=>{el.classList.remove('act','ok');});document.querySelectorAll('#flowBytes .fb-lbl').forEach(el=>{el.classList.remove('act');el.style.opacity='0.25';});}flowTimer=setInterval(()=>{if(flowCurrentStep>=flowSteps.length-1){flowPlaying=false;btn.textContent='▶ 播放';clearInterval(flowTimer);flowTimer=null;return;}flowStep(1);},flowSpeed);}else{btn.textContent='▶ 播放';if(flowTimer){clearInterval(flowTimer);flowTimer=null;}}}
-document.querySelectorAll('.fsp b').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.fsp b').forEach(b=>b.classList.remove('on'));btn.classList.add('on');flowSpeed=parseInt(btn.dataset.fs);if(flowPlaying){clearInterval(flowTimer);flowTimer=setInterval(()=>{if(flowCurrentStep>=flowSteps.length-1){flowPlaying=false;document.getElementById('flowPlayBtn').textContent='▶ 播放';clearInterval(flowTimer);flowTimer=null;return;}flowStep(1);},flowSpeed);}});});
+function flowTogglePlay(){flowPlaying=!flowPlaying;const btn=document.getElementById('flowPlayBtn');if(flowPlaying){btn.innerHTML='<svg width="13" height="13" style="vertical-align:-2px"><use href="#i-pause"/></svg> 暂停';if(flowCurrentStep>=flowSteps.length-1){flowCurrentStep=-1;document.querySelectorAll('#flowBytes .fb-hx').forEach(el=>{el.classList.remove('act','ok');});document.querySelectorAll('#flowBytes .fb-lbl').forEach(el=>{el.classList.remove('act');el.style.opacity='0.25';});}flowTimer=setInterval(()=>{if(flowCurrentStep>=flowSteps.length-1){flowPlaying=false;btn.innerHTML='<svg width="13" height="13" style="vertical-align:-2px"><use href="#i-play"/></svg> 播放';clearInterval(flowTimer);flowTimer=null;return;}flowStep(1);},flowSpeed);}else{btn.innerHTML='<svg width="13" height="13" style="vertical-align:-2px"><use href="#i-play"/></svg> 播放';if(flowTimer){clearInterval(flowTimer);flowTimer=null;}}}
+document.querySelectorAll('.fsp b').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.fsp b').forEach(b=>b.classList.remove('on'));btn.classList.add('on');flowSpeed=parseInt(btn.dataset.fs);if(flowPlaying){clearInterval(flowTimer);flowTimer=setInterval(()=>{if(flowCurrentStep>=flowSteps.length-1){flowPlaying=false;document.getElementById('flowPlayBtn').innerHTML='<svg width="13" height="13" style="vertical-align:-2px"><use href="#i-play"/></svg> 播放';clearInterval(flowTimer);flowTimer=null;return;}flowStep(1);},flowSpeed);}});});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('flowOverlay').classList.contains('open'))closeFlow();});
 document.getElementById('flowOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('flowOverlay'))closeFlow();});
 
 // ========== STRUCTURE ==========
 function renderStructure(tables){const list=document.getElementById('structList');const frag=document.createDocumentFragment();tables.forEach((t,i)=>{const d=document.createElement('div');d.className='si'+(i===0?' active':'');d.dataset.idx=i;d.innerHTML=`<span class="si-n">${t.name}</span><span class="si-c">${t.cnt}</span>`;d.onclick=()=>{list.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));d.classList.add('active');showStructDetail(tables[i]);};frag.appendChild(d);});list.innerHTML='';list.appendChild(frag);if(tables.length)showStructDetail(tables[0]);}
-function showStructDetail(tbl){const d=document.getElementById('structDetail');const meta=[{l:'TKEY',v:'0x'+(tbl.tkeyOff||0).toString(16).padStart(6,'0')},{l:'TDAT',v:'0x'+(tbl.tdatOff||0).toString(16).padStart(6,'0')},{l:'条目',v:tbl.cnt},{l:'TKEY',v:(tbl.tkeySz||0)+' B'},{l:'TDAT',v:(tbl.tdatSz||0)+' B'}];const entriesHtml=tbl.entries.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span><span class="rv">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem">▶</button></span></div>`).join('');d.innerHTML=`<div class="sd-h"><h3>${tbl.name}</h3><span class="sd-t">${tbl.name==='MAIN'?'主表':'子表'}</span></div><div class="sd-meta">${meta.map(m=>`<div class="md"><span class="ml">${m.l}</span><span class="mv">${m.v}</span></div>`).join('')}</div><div class="sd-search"><input type="text" placeholder="搜索…" oninput="filterStruct(this,'${tbl.name}')"></div><div class="sd-entries" id="sdEntries">${entriesHtml}</div>${tbl.cnt>300?`<div style="color:var(--muted-foreground);padding:0.5rem 0;font-size:0.72rem">… ${tbl.cnt-300} 条</div>`:''}`;}
-function filterStruct(input,tableName){const q=input.value.toLowerCase();const tbl=parser.r.tables.find(t=>t.name===tableName);if(!tbl)return;const f=q?tbl.entries.filter(e=>e.key.toLowerCase().includes(q)||e.text.toLowerCase().includes(q)):tbl.entries;document.getElementById('sdEntries').innerHTML=f.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span><span class="rv">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem">▶</button></span></div>`).join('');}
+function showStructDetail(tbl){const d=document.getElementById('structDetail');const meta=[{l:'TKEY',v:'0x'+(tbl.tkeyOff||0).toString(16).padStart(6,'0')},{l:'TDAT',v:'0x'+(tbl.tdatOff||0).toString(16).padStart(6,'0')},{l:'条目',v:tbl.cnt},{l:'TKEY',v:(tbl.tkeySz||0)+' B'},{l:'TDAT',v:(tbl.tdatSz||0)+' B'}];const entriesHtml=tbl.entries.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span><span class="rv">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem"><svg width="12" height="12"><use href="#i-play"/></svg></button></span></div>`).join('');d.innerHTML=`<div class="sd-h"><h3>${tbl.name}</h3><span class="sd-t">${tbl.name==='MAIN'?'主表':'子表'}</span></div><div class="sd-meta">${meta.map(m=>`<div class="md"><span class="ml">${m.l}</span><span class="mv">${m.v}</span></div>`).join('')}</div><div class="sd-search"><input type="text" placeholder="搜索…" oninput="filterStruct(this,'${tbl.name}')"></div><div class="sd-entries" id="sdEntries">${entriesHtml}</div>${tbl.cnt>300?`<div style="color:var(--muted-foreground);padding:0.5rem 0;font-size:0.72rem">… ${tbl.cnt-300} 条</div>`:''}`;}
+function filterStruct(input,tableName){const q=input.value.toLowerCase();const tbl=parser.r.tables.find(t=>t.name===tableName);if(!tbl)return;const f=q?tbl.entries.filter(e=>e.key.toLowerCase().includes(q)||e.text.toLowerCase().includes(q)):tbl.entries;document.getElementById('sdEntries').innerHTML=f.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span><span class="rv">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem"><svg width="12" height="12"><use href="#i-play"/></svg></button></span></div>`).join('');}
 
 // ========== STATS ==========
 function renderStatsPanel(){
@@ -781,7 +811,7 @@ function renderStatsPanel(){
       <div class="card">
         <div class="card-header"><h3>最长文本 Top 10</h3></div>
         <div class="card-body" style="max-height:300px;overflow-y:auto">
-          ${longest.map((e,i)=>`<div style="padding:0.3rem 0;border-bottom:1px solid rgba(39,39,42,0.3);font-size:0.78rem">
+          ${longest.map((e,i)=>`<div style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.78rem">
             <div style="display:flex;justify-content:space-between;margin-bottom:0.1rem">
               <span class="td-key" style="font-size:0.72rem" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span>
               <span style="font-family:var(--font-mono);font-size:0.68rem;color:var(--muted-foreground)">${e.text.length} 字符</span>
@@ -793,7 +823,7 @@ function renderStatsPanel(){
       <div class="card">
         <div class="card-header"><h3>最短文本 Top 10</h3></div>
         <div class="card-body" style="max-height:300px;overflow-y:auto">
-          ${shortest.map((e,i)=>`<div style="padding:0.3rem 0;border-bottom:1px solid rgba(39,39,42,0.3);font-size:0.78rem">
+          ${shortest.map((e,i)=>`<div style="padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.78rem">
             <div style="display:flex;justify-content:space-between;margin-bottom:0.1rem">
               <span class="td-key" style="font-size:0.72rem" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span>
               <span style="font-family:var(--font-mono);font-size:0.68rem;color:var(--muted-foreground)">${e.text.length} 字符</span>
@@ -825,7 +855,7 @@ function toggleTheme(){
   const isDark=html.classList.contains('dark');
   html.classList.toggle('dark');
   html.classList.toggle('light');
-  document.getElementById('themeToggle').textContent=isDark?'☀️':'🌙';
+  var ic=document.getElementById('themeIcon');if(ic)ic.innerHTML='<use href="'+(isDark?'#i-sun':'#i-moon')+'"/>';
   localStorage.setItem('gxt-theme',isDark?'light':'dark');
 }
 
@@ -836,7 +866,7 @@ function toggleTheme(){
     document.documentElement.classList.remove('dark');
     document.documentElement.classList.add('light');
     const btn=document.getElementById('themeToggle');
-    if(btn)btn.textContent='☀️';
+    var ic=document.getElementById('themeIcon');if(ic)ic.innerHTML='<use href="#i-sun"/>';
   }
 })();
 
