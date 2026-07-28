@@ -287,7 +287,7 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
     <div style="margin-left:auto;display:flex;gap:0.5rem">
       <button class="btn" onclick="exportJSON()">导出 JSON</button>
       <button class="btn" onclick="exportCSV()">导出 CSV</button>
-      <button class="btn" onclick="exportFXT()">导出 FXT</button>
+      <button class="btn" onclick="exportTXT()">导出 TXT</button>
     </div>
   </div>
 </header>
@@ -786,7 +786,7 @@ function copyAllVisible(){const rows=document.querySelectorAll('#entriesBody tr'
 function exportFiltered(){if(!filteredEntries.length)return;let csv='\uFEFF子表,键名,偏移,文本内容\n';for(const e of filteredEntries)csv+=`"${e.table}","${e.key}","0x${e.absOffset.toString(16)}","${e.text.replace(/"/g,'""')}"\n`;download('gxt_filtered.csv',csv,'text/csv;charset=utf-8');}
 function exportJSON(){if(!parser)return;download('gxt_export.json',JSON.stringify({format:parser.r.format,tables:parser.r.tables.map(t=>({name:t.name,count:t.cnt,entries:t.entries.map(e=>({key:e.key,text:e.text}))}))},null,2),'application/json');}
 function exportCSV(){if(!parser)return;let csv='\uFEFF子表,键名,偏移,文本内容\n';for(const e of parser.r.entries)csv+=`"${e.table}","${e.key}","0x${e.absOffset.toString(16)}","${e.text.replace(/"/g,'""')}"\n`;download('gxt_export.csv',csv,'text/csv;charset=utf-8');}
-function exportFXT(){if(!parser)return;let fxt='';for(const t of parser.r.tables){if(parser.r.tables.length>1)fxt+=`[${t.name}]\n`;for(const e of t.entries)fxt+=`${e.key}\n${e.text}\n`;}download('gxt_export.fxt',fxt,'text/plain');}
+function exportTXT(){if(!parser)return;let txt='';for(const t of parser.r.tables){txt+=`[${t.name}]\n`;for(const e of t.entries)txt+=`${e.key}=${e.text}\n`;txt+='\n';}download('gxt_export.txt',txt,'text/plain;charset=utf-8');}
 function download(name,content,type){
   try{
     const blob=new Blob([content],{type});
