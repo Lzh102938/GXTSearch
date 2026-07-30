@@ -52,7 +52,7 @@ html.light{
   --link:#4f46e5;
   --green:#16a34a;--blue:#2563eb;--purple:#9333ea;--amber:#d97706;--red:#dc2626;--cyan:#0891b2;
 }
-html{font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+html{font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;transition:background 0.3s,color 0.3s}
 body{background:var(--background);color:var(--foreground);font-family:var(--font-sans);line-height:1.6;min-height:100vh}
 
 
@@ -366,6 +366,50 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--card-border);color:var(--foreground);padding:0.5rem 1rem;border-radius:var(--radius);font-size:0.78rem;z-index:500;box-shadow:0 4px 16px rgba(0,0,0,0.4);opacity:0;transition:opacity 0.2s;pointer-events:none}
 .toast.show{opacity:1}
 
+
+/* Click feedback */
+.click-flash{animation:flash 0.3s ease-out}
+@keyframes flash{0%{background:rgba(99,102,241,0.15)}100%{background:transparent}}
+.btn:active{transform:scale(0.96);transition:transform 0.05s}
+.stat{cursor:pointer;user-select:none}
+.stat:active{transform:scale(0.97)}
+
+/* Table row click */
+tbody tr{cursor:pointer;transition:background 0.1s}
+tbody tr:active{background:rgba(99,102,241,0.1)}
+
+/* Tab switch animation */
+.panel.active{animation:fadeIn 0.15s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* Upload zone states */
+.upload.dragover{border-color:var(--primary);background:rgba(99,102,241,0.08);transform:scale(1.01)}
+
+/* Hex byte click */
+.hx-b:active{background:var(--primary)!important;color:#fff!important}
+
+/* Structure item click */
+.si:active{background:rgba(99,102,241,0.12)}
+
+/* Progress bar animation */
+.progress .fill{transition:width 0.15s ease-out}
+
+/* Alt file hover */
+.alt-file{transition:all 0.15s ease-out}
+.alt-file:active{transform:scale(0.98);background:rgba(99,102,241,0.1)}
+
+/* Search match flash */
+.mh{animation:matchFlash 0.5s ease-out}
+@keyframes matchFlash{0%{background:rgba(99,102,241,0.4)}100%{background:rgba(99,102,241,0.2)}}
+
+/* Current row highlight */
+tr.cur{animation:curPulse 1s ease-in-out infinite alternate}
+@keyframes curPulse{from{background:rgba(99,102,241,0.06)}to{background:rgba(99,102,241,0.12)}}
+
+/* Status bar */
+.status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--muted);border-top:1px solid var(--border);padding:0.25rem 1rem;display:flex;align-items:center;gap:1rem;font-size:0.68rem;color:var(--muted-foreground);z-index:50;font-family:var(--font-mono)}
+.status-bar .si-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+
 /* Footer */
 .footer{border-top:1px solid var(--border);padding:2rem 0 1.5rem;margin-top:3rem}
 .footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
@@ -482,7 +526,7 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
             <span><span class="dot dot-blue"></span>块头</span><span><span class="dot dot-purple"></span>段名</span><span><span class="dot dot-red"></span>偏移</span><span><span class="dot dot-green"></span>键名</span><span><span class="dot dot-amber"></span>文本</span><span><span class="dot dot-cyan"></span>表名</span>
           </div>
           <div class="hex-nav">
-            <button onclick="hexNav('start')">起始</button><button onclick="hexNav('tabl')">TABL</button><button onclick="hexNav('first-tkey')">TKEY</button><button onclick="hexNav('first-tdat')">TDAT</button>
+            <button onclick="hexNav('start');toast('跳转到起始')">起始</button><button onclick="hexNav('tabl');toast('跳转到 TABL')">TABL</button><button onclick="hexNav('first-tkey');toast('跳转到 TKEY')">TKEY</button><button onclick="hexNav('first-tdat');toast('跳转到 TDAT')">TDAT</button>
             <input type="text" id="hexAddrInput" placeholder="000000" onkeydown="if(event.key==='Enter')hexNavAddr()">
             <button onclick="hexNavAddr()">→</button>
           </div>
@@ -619,18 +663,26 @@ let flowSteps=[],flowCurrentStep=-1,flowPlaying=false,flowTimer=null,flowSpeed=2
 // ========== UPLOAD ==========
 const uz=document.getElementById('uploadZone'),fi=document.getElementById('fileInput');
 uz.addEventListener('click',()=>fi.click());
-uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('dragover');});
+uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('dragover');});uz.addEventListener('dragenter',e=>{e.preventDefault();uz.classList.add('dragover');});
 uz.addEventListener('dragleave',()=>uz.classList.remove('dragover'));
 uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('dragover');if(e.dataTransfer.files.length)loadFile(e.dataTransfer.files[0]);});
 fi.addEventListener('change',()=>{if(fi.files.length)loadFile(fi.files[0]);});
-function loadFile(f){const r=new FileReader();r.onload=e=>{rawData=new Uint8Array(e.target.result);uz.classList.add('has-file');uz.innerHTML=`<div style="display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0"><span class="uf-name">${f.name}</span><span class="uf-size">${(f.size/1024).toFixed(1)} KB</span><span class="uf-badge" id="fiFormat">检测中…</span></div><button class="btn btn-sm" onclick="document.getElementById('fileInput').click()">更换</button><input type="file" id="fileInput" accept=".gxt,.txt,.fxt,.dat,.bin">`;document.getElementById('fileInput').addEventListener('change',()=>{if(document.getElementById('fileInput').files.length)loadFile(document.getElementById('fileInput').files[0]);});document.getElementById('mainContent').style.display='block';doParse(e.target.result);};r.readAsArrayBuffer(f);}
+function loadFile(f){const r=new FileReader();r.onload=e=>{rawData=new Uint8Array(e.target.result);uz.classList.add('has-file');uz.innerHTML=`<div style="display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0"><span class="uf-name">${f.name}</span><span class="uf-size">${(f.size/1024).toFixed(1)} KB</span><span class="uf-badge" id="fiFormat">检测中…</span></div><button class="btn btn-sm" onclick="document.getElementById('fileInput').click()">更换</button><input type="file" id="fileInput" accept=".gxt,.txt,.fxt,.dat,.bin">`;document.getElementById('fileInput').addEventListener('change',()=>{if(document.getElementById('fileInput').files.length)loadFile(document.getElementById('fileInput').files[0]);});document.getElementById('mainContent').style.display='block';rememberFile(f.name);doParse(e.target.result);};r.readAsArrayBuffer(f);}
 
-async function doParse(buf){parser=new GXTParser(buf);allEntries=[];document.getElementById('parseLog').innerHTML='';document.getElementById('progressFill').style.width='0%';document.getElementById('progressText').textContent='';parser.detect();const fmt=document.getElementById('fiFormat');if(fmt)fmt.textContent=getFormatName();const result=await animatedParse(parser);allEntries=result.entries;filteredEntries=[...allEntries];renderStats(result);renderHex();renderEntries(allEntries);renderStructure(result.tables);populateFilter(result.tables);renderStatsPanel();}
+async function doParse(buf){parser=new GXTParser(buf);allEntries=[];document.getElementById('parseLog').innerHTML='';document.getElementById('progressFill').style.width='0%';document.getElementById('progressText').textContent='';parser.detect();const fmt=document.getElementById('fiFormat');if(fmt)fmt.textContent=getFormatName();toast('开始解析: '+getFormatName());const result=await animatedParse(parser);allEntries=result.entries;filteredEntries=[...allEntries];renderStats(result);renderHex();renderEntries(allEntries);renderStructure(result.tables);populateFilter(result.tables);renderStatsPanel();}
 
-async function animatedParse(p){const result=p.parse();const logEl=document.getElementById('parseLog');const fill=document.getElementById('progressFill');const ptxt=document.getElementById('progressText');const total=p.logs.length;const step=parseSpeed<=0?total:parseSpeed;for(let i=0;i<total;i+=step){const batch=p.logs.slice(i,i+step);for(const l of batch){const d=document.createElement('div');d.className='le';d.dataset.tag=l.tag;if(logFilter!=='all'&&l.tag!==logFilter)d.style.display='none';d.innerHTML=`<span class="ln">${l.i}</span><span class="arr">›</span><span class="msg">${l.msg}</span>`;logEl.appendChild(d);}const pct=Math.min(100,((i+step)/total*100)).toFixed(0);fill.style.width=pct+'%';ptxt.textContent=`${pct}% · ${result.entries.length} 条 · ${result.tables.length} 子表`;if(parseSpeed<100){logEl.scrollTop=logEl.scrollHeight;await new Promise(r=>requestAnimationFrame(r));}}const d=document.createElement('div');d.className='le';d.dataset.tag='info';d.innerHTML=`<span class="ln">${total+1}</span><span class="arr">✓</span><span class="msg"><span class="tag tag-e">完成</span> ${result.tables.length} 子表, ${result.entries.length} 条文本</span>`;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;fill.style.width='100%';ptxt.textContent=`完成 · ${result.tables.length} 子表 · ${result.entries.length.toLocaleString()} 条 · ${(rawData.length/1024).toFixed(0)} KB`;return result;}
+async function animatedParse(p){const result=p.parse();const logEl=document.getElementById('parseLog');const fill=document.getElementById('progressFill');const ptxt=document.getElementById('progressText');const total=p.logs.length;const step=parseSpeed<=0?total:parseSpeed;for(let i=0;i<total;i+=step){const batch=p.logs.slice(i,i+step);for(const l of batch){const d=document.createElement('div');d.className='le';d.dataset.tag=l.tag;if(logFilter!=='all'&&l.tag!==logFilter)d.style.display='none';d.innerHTML=`<span class="ln">${l.i}</span><span class="arr">›</span><span class="msg">${l.msg}</span>`;logEl.appendChild(d);}const pct=Math.min(100,((i+step)/total*100)).toFixed(0);fill.style.width=pct+'%';ptxt.textContent=`${pct}% · ${result.entries.length} 条 · ${result.tables.length} 子表`;if(parseSpeed<100){logEl.scrollTop=logEl.scrollHeight;await new Promise(r=>requestAnimationFrame(r));}}const d=document.createElement('div');d.className='le';d.dataset.tag='info';d.innerHTML=`<span class="ln">${total+1}</span><span class="arr">✓</span><span class="msg"><span class="tag tag-e">完成</span> ${result.tables.length} 子表, ${result.entries.length} 条文本</span>`;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;fill.style.width='100%';ptxt.textContent=`完成 · ${result.tables.length} 子表 · ${result.entries.length.toLocaleString()} 条 · ${(rawData.length/1024).toFixed(0)} KB`;toast('✓ 解析完成: '+result.entries.length.toLocaleString()+' 条文本');return result;}
 
 function getFormatName(){if(!parser)return'未知';const f=parser.r.format;if(f==='iii')return'GTA III';if(f==='vc')return'GTA VC';if(f==='sa')return'GTA San Andreas';if(f==='iv')return'GTA IV';return f.toUpperCase();}
-function renderStats(r){document.getElementById('statsBar').innerHTML=[{l:'格式',v:getFormatName()},{l:'子表',v:r.tables.length},{l:'条目',v:r.entries.length.toLocaleString()},{l:'大小',v:`${(rawData.length/1024).toFixed(0)} KB`},{l:'编码',v:r.format==='sa'?(r.bits===16?'UTF-16':'智能检测'):'UTF-16LE'}].map(s=>`<div class="stat"><div class="sl">${s.l}</div><div class="sv">${s.v}</div></div>`).join('');}
+function renderStats(r){
+  document.getElementById('statsBar').innerHTML=[{l:'格式',v:getFormatName()},{l:'子表',v:r.tables.length},{l:'条目',v:r.entries.length.toLocaleString()},{l:'大小',v:`${(rawData.length/1024).toFixed(0)} KB`},{l:'编码',v:r.format==='sa'?(r.bits===16?'UTF-16':'智能检测'):'UTF-16LE'}].map(s=>`<div class="stat" onclick="toast('${s.l}: ${s.v}')"><div class="sl">${s.l}</div><div class="sv">${s.v}</div></div>`).join('');
+  // Update status bar
+  const sf=document.getElementById('statusFormat');if(sf)sf.textContent=getFormatName();
+  const se=document.getElementById('statusEntries');if(se)se.textContent=r.entries.length.toLocaleString()+' 条';
+  const st=document.getElementById('statusTables');if(st)st.textContent=r.tables.length+' 子表';
+  const ss=document.getElementById('statusSize');if(ss)ss.textContent=(rawData.length/1024).toFixed(0)+' KB';
+  const sh=document.getElementById('statusHint');if(sh)sh.textContent='解析完成 · '+r.tables.length+' 子表 · '+r.entries.length.toLocaleString()+' 条';
+}
 
 // ========== HEX ==========
 let hexRendered=false;
@@ -816,7 +868,7 @@ function hlM(s,q){const esc=parser.escHTML(s);try{return esc.replace(new RegExp(
 function hlMT(s,q){let esc=hlTokens(parser.escHTML(s));try{return esc.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<span class="mh">$1</span>');}catch{return esc;}}
 function hlTokens(s){return s.replace(/~([^~]+)~/g,(m,i)=>{const cm={'r':'#ef4444','g':'#22c55e','b':'#3b82f6','w':'#e4e4e7','y':'#eab308','p':'#a855f7','o':'#f97316','n':'#06b6d4'};const c=cm[i.toLowerCase()];if(c&&i.length===1)return`<span class="tk"><span class="tk-c" style="background:${c}"></span>~${i}~</span>`;return`<span class="tk">~${i}~</span>`;});}
 function populateFilter(tables){const sel=document.getElementById('advTableFilter');sel.innerHTML='<option value="">全部子表</option>';for(const t of tables){const o=document.createElement('option');o.value=t.name;o.textContent=`${t.name}（${t.cnt}）`;sel.appendChild(o);}}
-document.querySelectorAll('thead th[data-sort]').forEach(th=>{th.addEventListener('click',()=>{const col=th.dataset.sort;document.querySelectorAll('thead th').forEach(t=>t.classList.remove('sorted','sorted-asc'));if(sortState.col===col)sortState.dir=sortState.dir==='asc'?'desc':'asc';else sortState={col,dir:'asc'};th.classList.add(sortState.dir==='asc'?'sorted-asc':'sorted');applySearch();});});
+document.querySelectorAll('thead th[data-sort]').forEach(th=>{th.addEventListener('click',()=>{const col=th.dataset.sort;document.querySelectorAll('thead th').forEach(t=>t.classList.remove('sorted','sorted-asc'));if(sortState.col===col)sortState.dir=sortState.dir==='asc'?'desc':'asc';else sortState={col,dir:'asc'};th.classList.add(sortState.dir==='asc'?'sorted-asc':'sorted');applySearch();toast('排序: '+col+' '+(sortState.dir==='asc'?'↑':'↓'));});});
 
 // ========== FLOW ==========
 function openFlow(tableName,key){const entry=allEntries.find(e=>e.table===tableName&&e.key===key);if(!entry)return;flowSteps=buildFlowSteps(entry);flowCurrentStep=-1;flowPlaying=false;if(flowTimer){clearInterval(flowTimer);flowTimer=null;}document.getElementById('flowTitle').textContent=`解析流程: ${entry.table} / ${entry.key}`;renderFlowMap();renderFlowBytes();renderFlowExplain();document.getElementById('flowDecode').innerHTML='';document.getElementById('flowOverlay').classList.add('open');document.getElementById('flowStatus').textContent=`0 / ${flowSteps.length}`;setTimeout(()=>flowTogglePlay(),400);}
@@ -833,7 +885,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
 document.getElementById('flowOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('flowOverlay'))closeFlow();});
 
 // ========== STRUCTURE ==========
-function renderStructure(tables){const list=document.getElementById('structList');const frag=document.createDocumentFragment();tables.forEach((t,i)=>{const d=document.createElement('div');d.className='si'+(i===0?' active':'');d.dataset.idx=i;d.innerHTML=`<span class="si-n">${t.name}</span><span class="si-c">${t.cnt}</span>`;d.onclick=()=>{list.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));d.classList.add('active');showStructDetail(tables[i]);};frag.appendChild(d);});list.innerHTML='';list.appendChild(frag);if(tables.length)showStructDetail(tables[0]);}
+function renderStructure(tables){const list=document.getElementById('structList');const frag=document.createDocumentFragment();tables.forEach((t,i)=>{const d=document.createElement('div');d.className='si'+(i===0?' active':'');d.dataset.idx=i;d.innerHTML=`<span class="si-n">${t.name}</span><span class="si-c">${t.cnt}</span>`;d.onclick=()=>{list.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));d.classList.add('active');showStructDetail(tables[i]);toast('子表: '+t.name+' ('+t.cnt+' 条)');};frag.appendChild(d);});list.innerHTML='';list.appendChild(frag);if(tables.length)showStructDetail(tables[0]);}
 function showStructDetail(tbl){const d=document.getElementById('structDetail');const meta=[{l:'TKEY',v:'0x'+(tbl.tkeyOff||0).toString(16).padStart(6,'0')},{l:'TDAT',v:'0x'+(tbl.tdatOff||0).toString(16).padStart(6,'0')},{l:'条目',v:tbl.cnt},{l:'TKEY',v:(tbl.tkeySz||0)+' B'},{l:'TDAT',v:(tbl.tdatSz||0)+' B'}];const entriesHtml=tbl.entries.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}');toast('已复制键名')">${parser.escHTML(e.key)}</span><span class="rv" ondblclick="openDetail('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem"><svg width="12" height="12"><use href="#i-play"/></svg></button></span></div>`).join('');d.innerHTML=`<div class="sd-h"><h3>${tbl.name}</h3><span class="sd-t">${tbl.name==='MAIN'?'主表':'子表'}</span></div><div class="sd-meta">${meta.map(m=>`<div class="md"><span class="ml">${m.l}</span><span class="mv">${m.v}</span></div>`).join('')}</div><div class="sd-search"><input type="text" placeholder="搜索…" oninput="filterStruct(this,'${tbl.name}')"></div><div class="sd-entries" id="sdEntries">${entriesHtml}</div>${tbl.cnt>300?`<div style="color:var(--muted-foreground);padding:0.5rem 0;font-size:0.72rem">… ${tbl.cnt-300} 条</div>`:''}`;}
 function filterStruct(input,tableName){const q=input.value.toLowerCase();const tbl=parser.r.tables.find(t=>t.name===tableName);if(!tbl)return;const f=q?tbl.entries.filter(e=>e.key.toLowerCase().includes(q)||e.text.toLowerCase().includes(q)):tbl.entries;document.getElementById('sdEntries').innerHTML=f.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}');toast('已复制键名')">${parser.escHTML(e.key)}</span><span class="rv" ondblclick="openDetail('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem"><svg width="12" height="12"><use href="#i-play"/></svg></button></span></div>`).join('');}
 
@@ -993,9 +1045,9 @@ function renderStatsPanel(){
 }
 
 // ========== TABS ==========
-document.querySelectorAll('.tab').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('panel-'+btn.dataset.tab).classList.add('active');if(btn.dataset.tab==='hex')ensureHexRendered();if(btn.dataset.tab==='stats')renderStatsPanel();});});
-document.querySelectorAll('.sb').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');parseSpeed=parseInt(btn.dataset.speed);if(parseSpeed===0)parseSpeed=999999;});});
-document.querySelectorAll('.lf').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.lf').forEach(b=>b.classList.remove('on'));btn.classList.add('on');logFilter=btn.dataset.filter;document.querySelectorAll('.le').forEach(el=>{el.style.display=(logFilter==='all'||el.dataset.tag===logFilter)?'':'none';});});});
+document.querySelectorAll('.tab').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('panel-'+btn.dataset.tab).classList.add('active');if(btn.dataset.tab==='hex')ensureHexRendered();if(btn.dataset.tab==='stats')renderStatsPanel();toast('切换: '+btn.textContent.trim());});});
+document.querySelectorAll('.sb').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');parseSpeed=parseInt(btn.dataset.speed);if(parseSpeed===0)parseSpeed=999999;toast('解析速度: '+btn.textContent.trim());});});
+document.querySelectorAll('.lf').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.lf').forEach(b=>b.classList.remove('on'));btn.classList.add('on');logFilter=btn.dataset.filter;document.querySelectorAll('.le').forEach(el=>{el.style.display=(logFilter==='all'||el.dataset.tag===logFilter)?'':'none';});toast('过滤: '+btn.textContent.trim());});});
 
 // ========== VISIT COUNT ==========
 (function(){
@@ -1050,16 +1102,19 @@ function scanAltFiles(){
   const loading=document.getElementById('altFilesLoading');
   const empty=document.getElementById('altFilesEmpty');
   loading.style.display='block';
+  loading.textContent='正在扫描目录…';
   grid.style.display='none';
   empty.style.display='none';
 
-  // Try to fetch directory listing from same path
   const base=getBasePath();
   const exts=['.gxt','.fxt','.dat','.bin','.txt'];
-  const knownFiles=discoverFiles(base,exts);
-  knownFiles.then(files=>{
+
+  // Timeout protection
+  const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),10000));
+
+  Promise.race([discoverFiles(base,exts),timeout]).then(files=>{
     loading.style.display='none';
-    if(files.length===0){
+    if(!files||files.length===0){
       empty.style.display='block';
     }else{
       grid.style.display='grid';
@@ -1074,9 +1129,11 @@ function scanAltFiles(){
         </div>
       `).join('');
     }
-  }).catch(()=>{
+  }).catch(err=>{
     loading.style.display='none';
     empty.style.display='block';
+    empty.textContent='扫描失败: '+(err.message||'网络错误')+'，请刷新重试';
+    console.warn('Alt files scan error:',err);
   });
 }
 
@@ -1095,8 +1152,6 @@ async function discoverFiles(base,exts){
   if(host.endsWith('.github.io')){
     try{
       const pathParts=window.location.pathname.split('/').filter(Boolean);
-      // For https://user.github.io/repo/ -> pathParts = ['repo']
-      // For https://user.github.io/repo/sub/ -> pathParts = ['repo','sub']
       const repo=pathParts[0]||'';
       const subPath=pathParts.slice(1).join('/');
       const owner=host.replace('.github.io','');
@@ -1112,7 +1167,7 @@ async function discoverFiles(base,exts){
           }
         }
       }
-    }catch(e){console.log('GitHub API scan failed:',e);}
+    }catch(e){console.warn('GitHub API scan failed:',e);}
     if(files.length)return files;
   }
 
@@ -1122,7 +1177,9 @@ async function discoverFiles(base,exts){
     'english.gxt','main.gxt','script.gxt',
     'american.fxt','english.fxt',
     'GTASA - american.gxt','GTASA - french.gxt','GTASA - german.gxt',
-    'GTASA - italian.gxt','GTASA - spanish.gxt'
+    'GTASA - italian.gxt','GTASA - spanish.gxt',
+    'GTAVC - american.gxt','GTAVC - french.gxt','GTAVC - german.gxt',
+    'GTAVC - italian.gxt','GTAVC - spanish.gxt'
   ];
 
   const promises=commonNames.map(async name=>{
@@ -1145,7 +1202,11 @@ async function discoverFiles(base,exts){
 }
 
 function loadAltFile(url,name){
-  fetch(url).then(r=>r.arrayBuffer()).then(buf=>{
+  toast('正在下载: '+name+'…');
+  fetch(url).then(r=>{
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return r.arrayBuffer();
+  }).then(buf=>{
     rawData=new Uint8Array(buf);
     const uz=document.getElementById('uploadZone');
     uz.classList.add('has-file');
@@ -1154,8 +1215,10 @@ function loadAltFile(url,name){
     document.getElementById('mainContent').style.display='block';
     doParse(buf);
     document.getElementById('mainContent').scrollIntoView({behavior:'smooth'});
+    toast('✓ '+name+' 加载完成');
   }).catch(err=>{
-    alert('加载失败: '+err.message);
+    toast('✗ 加载失败: '+err.message);
+    console.error('loadAltFile error:',err);
   });
 }
 
@@ -1256,7 +1319,8 @@ function setFontSize(sz) {
   document.documentElement.style.fontSize = sz + 'px';
   localStorage.setItem('gxt-fontsize', sz);
   const el = document.getElementById('fontSizeVal');
-  if (el) el.textContent = sz + 'px';
+  if (el) { el.textContent = sz + 'px'; el.style.color='var(--primary)'; setTimeout(()=>el.style.color='',500); }
+  toast('字号: '+sz+'px');
 }
 (function () {
   const saved = localStorage.getItem('gxt-fontsize');
@@ -1283,7 +1347,18 @@ function printView() {
     const e = filteredEntries[i];
     html += `<tr><td>${i}</td><td>${parser.escHTML(e.table)}</td><td>${parser.escHTML(e.key)}</td><td>${parser.escHTML(e.text)}</td></tr>`;
   }
-  html += '</tbody></table></body></html>';
+  html += '</tbody></table><div class="status-bar" id="statusBar">
+  <span class="si-dot"></span>
+  <span id="statusFormat">未加载</span>
+  <span>|</span>
+  <span id="statusEntries">0 条</span>
+  <span>|</span>
+  <span id="statusTables">0 子表</span>
+  <span>|</span>
+  <span id="statusSize">0 KB</span>
+  <span style="margin-left:auto" id="statusHint">拖放文件或选择备选文件开始</span>
+</div>
+</body></html>';
   w.document.write(html);
   w.document.close();
   setTimeout(() => w.print(), 300);
@@ -1322,6 +1397,138 @@ document.addEventListener('keydown', e => {
 // Patch updateTable to add context menu and double-click on rows
 const _origRenderPage = renderPage;
 
+
+
+// ========== MORE BASIC FEATURES ==========
+
+// Auto-save last file name for UX
+function rememberFile(name) {
+  try { localStorage.setItem('gxt-lastfile', name); } catch {}
+  const el = document.getElementById('statusHint');
+  if (el) el.textContent = '当前: ' + name;
+}
+
+// Load file name on startup
+(function () {
+  const last = localStorage.getItem('gxt-lastfile');
+  if (last) {
+    const el = document.getElementById('statusHint');
+    if (el) el.textContent = '上次打开: ' + last + ' · 拖放新文件开始';
+  }
+})();
+
+// Patch loadFile to remember name
+const _origLoadFile = typeof loadFile === 'function' ? loadFile : null;
+if (_origLoadFile) {
+  // Already defined, we'll patch via wrapper in the file input handler
+}
+
+// Stat card click shows detail
+document.addEventListener('click', function (e) {
+  const stat = e.target.closest('.stat');
+  if (stat && stat.dataset.info) {
+    toast(stat.dataset.info);
+  }
+});
+
+// Table row single-click shows mini-info in status bar
+document.getElementById('entriesBody')?.addEventListener('click', function (e) {
+  const tr = e.target.closest('tr');
+  if (!tr) return;
+  const key = tr.dataset.k;
+  const tbl = tr.dataset.t;
+  const sh = document.getElementById('statusHint');
+  if (sh && key) sh.textContent = tbl + ' / ' + key;
+});
+
+// Hex byte click copies address
+document.getElementById('hexBody')?.addEventListener('click', function (e) {
+  const el = e.target.closest('.hx-b');
+  if (el) {
+    const off = parseInt(el.dataset.off);
+    if (!isNaN(off)) {
+      copyText('0x' + off.toString(16).padStart(6, '0'));
+      toast('已复制: 0x' + off.toString(16).padStart(6, '0'));
+      el.classList.add('click-flash');
+      setTimeout(() => el.classList.remove('click-flash'), 300);
+    }
+  }
+});
+
+// Address click in hex view
+document.getElementById('hexBody')?.addEventListener('click', function (e) {
+  const el = e.target.closest('.hx-addr');
+  if (el) {
+    copyText('0x' + el.textContent);
+    toast('已复制: 0x' + el.textContent);
+  }
+});
+
+// Entry count in search updates status bar
+const _origApplySearch2 = applySearch;
+// Already handled via renderStats
+
+// Keyboard shortcut summary
+document.addEventListener('keydown', function (e) {
+  // ? = show shortcuts
+  if (e.key === '?' && !e.ctrlKey && !e.metaKey && document.activeElement !== searchField) {
+    e.preventDefault();
+    toast('快捷键: / 搜索 | J 跳转 | Ctrl+P 打印 | Esc 关闭');
+  }
+});
+
+// Copy with animation
+function copyWithFeedback(text, label) {
+  copyText(text);
+  toast('已复制' + (label || '') + ': ' + (text.length > 40 ? text.substring(0, 40) + '…' : text));
+}
+
+// Patch td-key click to show toast
+document.addEventListener('click', function (e) {
+  const td = e.target.closest('.td-key');
+  if (td) {
+    td.classList.add('click-flash');
+    setTimeout(() => td.classList.remove('click-flash'), 300);
+  }
+});
+
+// Patch td-off click to show toast
+document.addEventListener('click', function (e) {
+  const td = e.target.closest('.td-off');
+  if (td) {
+    td.classList.add('click-flash');
+    setTimeout(() => td.classList.remove('click-flash'), 300);
+    toast('跳转到 HEX: ' + td.textContent);
+  }
+});
+
+// Export buttons feedback
+function exportJSON() {
+  if (!parser) { toast('请先加载文件'); return; }
+  download('gxt_export.json', JSON.stringify({ format: parser.r.format, tables: parser.r.tables.map(t => ({ name: t.name, count: t.cnt, entries: t.entries.map(e => ({ key: e.key, text: e.text })) })) }, null, 2), 'application/json');
+  toast('✓ JSON 已导出');
+}
+function exportCSV() {
+  if (!parser) { toast('请先加载文件'); return; }
+  let csv = '\uFEFF子表,键名,偏移,文本内容\n';
+  for (const e of parser.r.entries) csv += `"${e.table}","${e.key}","0x${e.absOffset.toString(16)}","${e.text.replace(/"/g, '""')}"\n`;
+  download('gxt_export.csv', csv, 'text/csv;charset=utf-8');
+  toast('✓ CSV 已导出 (' + parser.r.entries.length + ' 条)');
+}
+function exportTXT() {
+  if (!parser) { toast('请先加载文件'); return; }
+  let txt = '';
+  for (const t of parser.r.tables) { txt += `[${t.name}]\n`; for (const e of t.entries) txt += `${e.key}=${e.text}\n`; txt += '\n'; }
+  download('gxt_export.txt', txt, 'text/plain;charset=utf-8');
+  toast('✓ TXT 已导出');
+}
+function exportFiltered() {
+  if (!filteredEntries.length) { toast('没有可导出的数据'); return; }
+  let csv = '\uFEFF子表,键名,偏移,文本内容\n';
+  for (const e of filteredEntries) csv += `"${e.table}","${e.key}","0x${e.absOffset.toString(16)}","${e.text.replace(/"/g, '""')}"\n`;
+  download('gxt_filtered.csv', csv, 'text/csv;charset=utf-8');
+  toast('✓ 已导出 ' + filteredEntries.length + ' 条筛选结果');
+}
 
 // ========== UTILS ==========
 function copyText(t){try{navigator.clipboard?.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
