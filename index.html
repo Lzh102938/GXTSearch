@@ -318,6 +318,54 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 .alt-file-loading{padding:1rem;text-align:center;color:var(--muted-foreground);font-size:0.78rem}
 .alt-file-empty{padding:0.8rem;text-align:center;color:var(--muted-foreground);font-size:0.75rem;opacity:0.6}
 
+
+/* Context Menu */
+.ctx-menu{position:fixed;background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:0.3rem 0;z-index:200;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:none}
+.ctx-menu.open{display:block}
+.ctx-item{display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.8rem;cursor:pointer;font-size:0.78rem;color:var(--foreground);transition:background 0.08s;white-space:nowrap}
+.ctx-item:hover{background:var(--muted)}
+.ctx-item svg{width:14px;height:14px;opacity:0.5;flex-shrink:0}
+.ctx-item .ctx-key{margin-left:auto;font-size:0.65rem;color:var(--muted-foreground);font-family:var(--font-mono)}
+.ctx-sep{height:1px;background:var(--border);margin:0.25rem 0}
+.ctx-item.warn{color:var(--amber)}
+.ctx-item.warn svg{opacity:0.8;color:var(--amber)}
+
+/* Entry Detail Modal */
+.detail-bg{position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
+.detail-bg.open{display:flex}
+.detail-box{background:var(--background);border:1px solid var(--border);border-radius:calc(var(--radius)*2);width:100%;max-width:680px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+.detail-hdr{display:flex;align-items:center;gap:0.6rem;padding:0.6rem 1rem;background:var(--muted);border-bottom:1px solid var(--border);flex-shrink:0}
+.detail-hdr h3{font-size:0.88rem;font-weight:600;font-family:var(--font-mono);color:var(--foreground);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.detail-x{background:none;border:none;color:var(--muted-foreground);cursor:pointer;font-size:1.1rem;padding:0.15rem 0.3rem;border-radius:4px;line-height:1}.detail-x:hover{color:var(--foreground);background:var(--secondary)}
+.detail-body{flex:1;overflow-y:auto;padding:1rem}
+.detail-row{display:flex;gap:0.5rem;margin-bottom:0.6rem;align-items:flex-start}
+.detail-label{font-size:0.72rem;color:var(--muted-foreground);min-width:4.5rem;text-align:right;flex-shrink:0;padding-top:0.15rem}
+.detail-val{font-size:0.82rem;color:var(--foreground);word-break:break-word;line-height:1.5;min-width:0;flex:1}
+.detail-val.mono{font-family:var(--font-mono)}
+.detail-text-box{background:var(--muted);border:1px solid var(--border);border-radius:var(--radius);padding:0.6rem 0.8rem;font-size:0.82rem;line-height:1.6;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.detail-actions{display:flex;gap:0.4rem;padding:0.6rem 1rem;border-top:1px solid var(--border);background:var(--muted);flex-shrink:0;flex-wrap:wrap}
+
+/* Edit Warning Modal */
+.editwarn-bg{position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:300;display:none;align-items:center;justify-content:center;padding:1rem}
+.editwarn-bg.open{display:flex}
+.editwarn-box{background:var(--background);border:1px solid var(--border);border-radius:calc(var(--radius)*2);width:100%;max-width:440px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.5)}
+.editwarn-icon{text-align:center;padding:1.5rem 1rem 0.5rem}
+.editwarn-icon svg{width:48px;height:48px;color:var(--amber);opacity:0.8}
+.editwarn-body{text-align:center;padding:0 1.5rem 1rem}
+.editwarn-body h3{font-size:1rem;font-weight:700;margin-bottom:0.4rem}
+.editwarn-body p{font-size:0.82rem;color:var(--muted-foreground);line-height:1.6;margin-bottom:1rem}
+.editwarn-btns{display:flex;gap:0.5rem;justify-content:center;padding:0 1.5rem 1.5rem}
+.editwarn-btns .btn{min-width:100px;justify-content:center}
+
+/* Font Size Slider */
+.font-ctrl{display:flex;align-items:center;gap:0.4rem}
+.font-ctrl input[type=range]{width:80px;accent-color:var(--primary);height:4px}
+.font-ctrl .fv{font-family:var(--font-mono);font-size:0.68rem;color:var(--muted-foreground);min-width:2.5rem;text-align:center}
+
+/* Toast */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--card-border);color:var(--foreground);padding:0.5rem 1rem;border-radius:var(--radius);font-size:0.78rem;z-index:500;box-shadow:0 4px 16px rgba(0,0,0,0.4);opacity:0;transition:opacity 0.2s;pointer-events:none}
+.toast.show{opacity:1}
+
 /* Footer */
 .footer{border-top:1px solid var(--border);padding:2rem 0 1.5rem;margin-top:3rem}
 .footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
@@ -365,9 +413,16 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
     </div>
     <div style="margin-left:auto;display:flex;gap:0.5rem;align-items:center">
       <span style="font-size:0.72rem;color:var(--muted-foreground);font-family:var(--font-mono)" id="visitCount"></span>
-      <button class="btn" onclick="exportJSON()">导出 JSON</button>
-      <button class="btn" onclick="exportCSV()">导出 CSV</button>
-      <button class="btn" onclick="exportTXT()">导出 TXT</button>
+      <button class="btn" onclick="exportJSON()" title="导出 JSON">JSON</button>
+      <button class="btn" onclick="exportCSV()" title="导出 CSV">CSV</button>
+      <button class="btn" onclick="exportTXT()" title="导出 TXT">TXT</button>
+      <button class="btn" onclick="printView()" title="打印 (Ctrl+P)"><svg width="14" height="14" style="vertical-align:-2px"><use href="#i-clipboard"/></svg></button>
+      <button class="btn" onclick="jumpToEntry()" title="跳转到条目 (J)"><svg width="14" height="14" style="vertical-align:-2px"><use href="#i-search"/></svg></button>
+      <div class="font-ctrl">
+        <button class="btn" onclick="setFontSize(Math.max(11,baseFontSize-1))" style="padding:0.3rem 0.4rem;font-size:0.72rem" title="缩小字体">A-</button>
+        <span class="fv" id="fontSizeVal">14px</span>
+        <button class="btn" onclick="setFontSize(Math.min(20,baseFontSize+1))" style="padding:0.3rem 0.4rem;font-size:0.85rem" title="放大字体">A+</button>
+      </div>
       <button class="btn" id="themeToggle" onclick="toggleTheme()" title="切换主题" style="padding:0.4rem 0.5rem;font-size:0.85rem"><svg width="15" height="15" id="themeIcon"><use href="#i-moon"/></svg></button>
     </div>
   </div>
@@ -542,7 +597,8 @@ class GXTParser {
   utf16(o){const c=[];let i=o;while(i+1<this.d.length){const lo=this.d[i],hi=this.d[i+1];if(!lo&&!hi)break;c.push(String.fromCharCode(lo|(hi<<8)));i+=2;}return c.join('');}
   w1252(o){let end=o;while(end<this.d.length&&this.d[end])end++;const bytes=this.d.slice(o,end);let s='';for(const b of bytes){if(b<0x80)s+=String.fromCharCode(b);else if(b===0x80)s+='\u20AC';else if(b===0x82)s+='\u201A';else if(b===0x83)s+='\u0192';else if(b===0x84)s+='\u201E';else if(b===0x85)s+='\u2026';else if(b===0x86)s+='\u2020';else if(b===0x87)s+='\u2021';else if(b===0x88)s+='\u02C6';else if(b===0x89)s+='\u2030';else if(b===0x8A)s+='\u0160';else if(b===0x8B)s+='\u2039';else if(b===0x8C)s+='\u0152';else if(b===0x8E)s+='\u017D';else s+=String.fromCharCode(b);}return s;}
   smartDecode(o){let end=o;while(end<this.d.length&&this.d[end])end++;const bytes=this.d.slice(o,end);if(!bytes.length)return'';let hasMB=false;for(const b of bytes){if(b>=0xC0){hasMB=true;break;}}if(hasMB){try{return new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{}try{return new TextDecoder('gbk',{fatal:true}).decode(bytes);}catch{}}return this.w1252(o);}
-  detect(){const d=this.d;if(d.length>8){const ver=this.u16(0),bits=this.u16(2);if((ver===3||ver===4)&&(bits===8||bits===16)&&d[4]===0x54&&d[5]===0x41&&d[6]===0x42&&d[7]===0x4C){this.r.format='sa';this.r.version=ver;this.r.bits=bits;this.log(`检测格式: <span class="hv">GTA SA/IV</span> v${ver} ${bits}bit`,'header');return;}}if(d[0]===0x54&&d[1]===0x41&&d[2]===0x42&&d[3]===0x4C){const sz=this.u32(4),n=Math.floor(sz/12);if(n>0&&n<500&&this.str(8,8)==='MAIN'){this.r.format='vc';this.log(`检测格式: <span class="hv">GTA Vice City</span> (${n} 子表)`,'header');return;}}if(d[0]===0x54&&d[1]===0x4B&&d[2]===0x45&&d[3]===0x59){this.r.format='iii';this.log('检测格式: <span class="hv">GTA III</span>','header');return;}this.r.format='vc';this.log('尝试 VC 格式','warn');}
+  detect(){const d=this.d;if(d.length>8){const ver=this.u16(0),bits=this.u16(2);if(ver===4&&(bits===8||bits===16)&&d[4]===0x54&&d[5]===0x41&&d[6]===0x42&&d[7]===0x4C){this.r.version=ver;this.r.bits=bits;const isSA=this._checkTKEYSorted();this.r.format=isSA?'sa':'iv';this.log(`检测格式: <span class="hv">GTA ${isSA?'San Andreas':'IV'}</span> v${ver} ${bits}bit${isSA?' · TKEY 有序':' · TKEY 无序'}`,'header');return;}}if(d[0]===0x54&&d[1]===0x41&&d[2]===0x42&&d[3]===0x4C){const sz=this.u32(4),n=Math.floor(sz/12);if(n>0&&n<500&&this.str(8,8)==='MAIN'){this.r.format='vc';this.log(`检测格式: <span class="hv">GTA Vice City</span> (${n} 子表)`,'header');return;}}if(d[0]===0x54&&d[1]===0x4B&&d[2]===0x45&&d[3]===0x59){this.r.format='iii';this.log('检测格式: <span class="hv">GTA III</span>','header');return;}this.r.format='vc';this.log('尝试 VC 格式','warn');}
+  _checkTKEYSorted(){const d=this.d;const hdr=4;const tablOff=hdr;const tablSz=this.u32(tablOff+4);const nTbl=Math.floor(tablSz/12);if(nTbl===0)return false;const firstOff=this.u32(tablOff+16);const tkeyOff=firstOff;const tkeySz=this.u32(tkeyOff+4);const nEnt=Math.floor(tkeySz/8);if(nEnt<2)return true;const check=Math.min(nEnt,30);let prevCRC=0;for(let i=0;i<check;i++){const eo=tkeyOff+8+i*8;const crc=this.u32(eo+4);if(crc<prevCRC)return false;prevCRC=crc;}return true;}
   parse(){this.detect();if(this.r.format==='vc')return this.parseVC();if(this.r.format==='iii')return this.parseIII();return this.parseSA();}
   parseVC(){this.log('<span class="tag tag-h">TABL</span> 读取块头 <span class="hv">0x000000</span>','header');this.hlAdd(0,4,'header');const tablSz=this.u32(4);this.hlAdd(4,4,'header');const nTbl=Math.floor(tablSz/12);this.log(`<span class="tag tag-h">TABL</span> 块大小: <span class="hv">${tablSz}</span> 字节, <span class="hv">${nTbl}</span> 个子表引用`,'header');const tbls=[];for(let i=0;i<nTbl;i++){const o=8+i*12;const name=this.str(o,8);const off=this.u32(o+8);tbls.push({name,off});this.hlAdd(o,8,'name');this.hlAdd(o+8,4,'offset');}this.log(`<span class="tag tag-s">TABL</span> 子表: ${tbls.slice(0,10).map(t=>'<span class="hv">'+t.name+'</span>').join(', ')}${tbls.length>10?' … 共'+tbls.length+'个':''}`,'section');for(const tbl of tbls)this.parseVCSub(tbl.name,tbl.off);this.r.totalEntries=this.r.entries.length;return this.r;}
   parseVCSub(name,startOff){let tkeyStart=startOff;if(name==='MAIN'){this.log(`<span class="tag tag-s">${name}</span> 主表 @ <span class="hv">0x${this.hex(startOff)}</span>`,'section');}else{tkeyStart=startOff+8;const actualName=this.str(startOff,8);this.log(`<span class="tag tag-s">${name}</span> @ <span class="hv">0x${this.hex(startOff)}</span>, 名称 \"<span class="hv">${actualName}</span>\", TKEY @ <span class="hv">0x${this.hex(tkeyStart)}</span>`,'section');this.hlAdd(startOff,8,'name');}const tkeyMagic=this.str(tkeyStart,4);if(tkeyMagic!=='TKEY'){this.log(`<span class="tag tag-w">异常</span> 期望 TKEY @ 0x${this.hex(tkeyStart)}`,'warn');return;}this.hlAdd(tkeyStart,4,'header');const tkeySz=this.u32(tkeyStart+4);this.hlAdd(tkeyStart+4,4,'header');const nEnt=Math.floor(tkeySz/12);this.log(`<span class="tag tag-h">TKEY</span> <span class="hv">${tkeySz}</span> B → <span class="hv">${nEnt}</span> 条 (12B: 4偏移+8键名)`,'header');const tdatStart=tkeyStart+8+tkeySz;const tdatSz=this.u32(tdatStart+4);const textBase=tdatStart+8;this.hlAdd(tdatStart,4,'header');this.hlAdd(tdatStart+4,4,'header');this.log(`<span class="tag tag-h">TDAT</span> @ <span class="hv">0x${this.hex(tdatStart)}</span>, <span class="hv">${tdatSz}</span> B, 文本 @ <span class="hv">0x${this.hex(textBase)}</span>`,'header');const tbl={name,tkeyOff:tkeyStart,tkeySz,tdatOff:tdatStart,tdatSz,cnt:nEnt,entries:[],textBase};const kStart=tkeyStart+8;for(let i=0;i<nEnt;i++){const eo=kStart+i*12;const relOff=this.u32(eo);const key=this.str(eo+4,8);const absOff=textBase+relOff;let text=absOff<this.d.length-1?this.utf16(absOff):'';this.hlAdd(eo+4,8,'key');this.hlAdd(eo,4,'offset');const tb=Math.min(text.length*2,128);if(absOff+tb<=this.d.length)this.hlAdd(absOff,tb,'text');const entry={table:name,key,idx:i,offset:relOff,absOffset:absOff,text,eo,entrySize:12};this.r.entries.push(entry);tbl.entries.push(entry);if(i<3||i===nEnt-1){const disp=text.length>70?text.substring(0,70)+'…':text;this.log(`<span class="tag tag-e">[${i}]</span> <span class="hv">"${key}"</span> → "${this.escHTML(disp)}"`,'entry');}else if(i===3)this.log(`<span class="tag tag-i">…</span> 还有 ${nEnt-4} 个条目`,'info');}this.r.tables.push(tbl);this.log(`<span class="tag tag-s">${name}</span> ✓ <span class="hv">${nEnt}</span> 条`,'section');}
@@ -573,7 +629,7 @@ async function doParse(buf){parser=new GXTParser(buf);allEntries=[];document.get
 
 async function animatedParse(p){const result=p.parse();const logEl=document.getElementById('parseLog');const fill=document.getElementById('progressFill');const ptxt=document.getElementById('progressText');const total=p.logs.length;const step=parseSpeed<=0?total:parseSpeed;for(let i=0;i<total;i+=step){const batch=p.logs.slice(i,i+step);for(const l of batch){const d=document.createElement('div');d.className='le';d.dataset.tag=l.tag;if(logFilter!=='all'&&l.tag!==logFilter)d.style.display='none';d.innerHTML=`<span class="ln">${l.i}</span><span class="arr">›</span><span class="msg">${l.msg}</span>`;logEl.appendChild(d);}const pct=Math.min(100,((i+step)/total*100)).toFixed(0);fill.style.width=pct+'%';ptxt.textContent=`${pct}% · ${result.entries.length} 条 · ${result.tables.length} 子表`;if(parseSpeed<100){logEl.scrollTop=logEl.scrollHeight;await new Promise(r=>requestAnimationFrame(r));}}const d=document.createElement('div');d.className='le';d.dataset.tag='info';d.innerHTML=`<span class="ln">${total+1}</span><span class="arr">✓</span><span class="msg"><span class="tag tag-e">完成</span> ${result.tables.length} 子表, ${result.entries.length} 条文本</span>`;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;fill.style.width='100%';ptxt.textContent=`完成 · ${result.tables.length} 子表 · ${result.entries.length.toLocaleString()} 条 · ${(rawData.length/1024).toFixed(0)} KB`;return result;}
 
-function getFormatName(){if(!parser)return'未知';const f=parser.r.format,v=parser.r.version;if(f==='iii')return'GTA III';if(f==='vc')return'GTA VC';if(f==='sa'){if(v===4)return'GTA IV';if(v===3)return'GTA SA';return'SA/IV';}return f.toUpperCase();}
+function getFormatName(){if(!parser)return'未知';const f=parser.r.format;if(f==='iii')return'GTA III';if(f==='vc')return'GTA VC';if(f==='sa')return'GTA San Andreas';if(f==='iv')return'GTA IV';return f.toUpperCase();}
 function renderStats(r){document.getElementById('statsBar').innerHTML=[{l:'格式',v:getFormatName()},{l:'子表',v:r.tables.length},{l:'条目',v:r.entries.length.toLocaleString()},{l:'大小',v:`${(rawData.length/1024).toFixed(0)} KB`},{l:'编码',v:r.format==='sa'?(r.bits===16?'UTF-16':'智能检测'):'UTF-16LE'}].map(s=>`<div class="stat"><div class="sl">${s.l}</div><div class="sv">${s.v}</div></div>`).join('');}
 
 // ========== HEX ==========
@@ -699,7 +755,7 @@ function renderPage(){
     let textHTML=hlTokens(parser.escHTML(e.text));
     let keyHTML=parser.escHTML(e.key);
     if(matcher){if(matcher(e.key))keyHTML=hlM(e.key,q);if(matcher(e.text))textHTML=hlMT(e.text,q);}
-    html+=`<tr data-t="${parser.escHTML(e.table)}" data-k="${parser.escHTML(e.key)}"><td class="td-tbl">${parser.escHTML(e.table)}</td><td class="td-key" onclick="copyText(this.textContent)">${keyHTML}</td><td class="td-off" onclick="goToHex(${e.absOffset})">0x${e.absOffset.toString(16).padStart(6,'0')}</td><td class="td-txt">${textHTML}</td><td class="td-act"><button class="btn btn-sm btn-primary" onclick="openFlow(this.closest('tr').dataset.t,this.closest('tr').dataset.k)" style="font-size:0.65rem;padding:0.18rem 0.35rem"><svg width="12" height="12" style="vertical-align:-1px"><use href="#i-play"/></svg> 解析</button></td></tr>`;
+    html+=`<tr data-t="${parser.escHTML(e.table)}" data-k="${parser.escHTML(e.key)}"><td class="td-tbl">${parser.escHTML(e.table)}</td><td class="td-key" onclick="copyText(this.textContent);toast('已复制键名')">${keyHTML}</td><td class="td-off" onclick="goToHex(${e.absOffset})">0x${e.absOffset.toString(16).padStart(6,'0')}</td><td class="td-txt" ondblclick="openDetail('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')">${textHTML}</td><td class="td-act"><button class="btn btn-sm btn-primary" onclick="openFlow(this.closest('tr').dataset.t,this.closest('tr').dataset.k)" style="font-size:0.65rem;padding:0.18rem 0.35rem"><svg width="12" height="12" style="vertical-align:-1px"><use href="#i-play"/></svg> 解析</button></td></tr>`;
   }
   document.getElementById('entriesBody').innerHTML=html;
   renderPagination();
@@ -738,6 +794,24 @@ function goPage(p){
   renderPage();
   document.querySelector('#panel-entries .tbl-wrap').scrollTop=0;
 }
+
+// Context menu delegation on entries table
+document.getElementById('entriesBody').addEventListener('contextmenu', function(e) {
+  const tr = e.target.closest('tr');
+  if (!tr) return;
+  openCtxMenu(e, tr.dataset.t, tr.dataset.k);
+});
+
+// Context menu on structure detail entries
+document.getElementById('structDetail').addEventListener('contextmenu', function(e) {
+  const row = e.target.closest('.sd-r');
+  if (!row) return;
+  const keyEl = row.querySelector('.rk');
+  if (!keyEl) return;
+  const key = keyEl.textContent;
+  const tbl = parser.r.tables.find(t => t.entries.some(en => en.key === key));
+  if (tbl) openCtxMenu(e, tbl.name, key);
+});
 function hlM(s,q){const esc=parser.escHTML(s);try{return esc.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<span class="mh">$1</span>');}catch{return esc;}}
 function hlMT(s,q){let esc=hlTokens(parser.escHTML(s));try{return esc.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<span class="mh">$1</span>');}catch{return esc;}}
 function hlTokens(s){return s.replace(/~([^~]+)~/g,(m,i)=>{const cm={'r':'#ef4444','g':'#22c55e','b':'#3b82f6','w':'#e4e4e7','y':'#eab308','p':'#a855f7','o':'#f97316','n':'#06b6d4'};const c=cm[i.toLowerCase()];if(c&&i.length===1)return`<span class="tk"><span class="tk-c" style="background:${c}"></span>~${i}~</span>`;return`<span class="tk">~${i}~</span>`;});}
@@ -760,8 +834,8 @@ document.getElementById('flowOverlay').addEventListener('click',e=>{if(e.target=
 
 // ========== STRUCTURE ==========
 function renderStructure(tables){const list=document.getElementById('structList');const frag=document.createDocumentFragment();tables.forEach((t,i)=>{const d=document.createElement('div');d.className='si'+(i===0?' active':'');d.dataset.idx=i;d.innerHTML=`<span class="si-n">${t.name}</span><span class="si-c">${t.cnt}</span>`;d.onclick=()=>{list.querySelectorAll('.si').forEach(e=>e.classList.remove('active'));d.classList.add('active');showStructDetail(tables[i]);};frag.appendChild(d);});list.innerHTML='';list.appendChild(frag);if(tables.length)showStructDetail(tables[0]);}
-function showStructDetail(tbl){const d=document.getElementById('structDetail');const meta=[{l:'TKEY',v:'0x'+(tbl.tkeyOff||0).toString(16).padStart(6,'0')},{l:'TDAT',v:'0x'+(tbl.tdatOff||0).toString(16).padStart(6,'0')},{l:'条目',v:tbl.cnt},{l:'TKEY',v:(tbl.tkeySz||0)+' B'},{l:'TDAT',v:(tbl.tdatSz||0)+' B'}];const entriesHtml=tbl.entries.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span><span class="rv">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem"><svg width="12" height="12"><use href="#i-play"/></svg></button></span></div>`).join('');d.innerHTML=`<div class="sd-h"><h3>${tbl.name}</h3><span class="sd-t">${tbl.name==='MAIN'?'主表':'子表'}</span></div><div class="sd-meta">${meta.map(m=>`<div class="md"><span class="ml">${m.l}</span><span class="mv">${m.v}</span></div>`).join('')}</div><div class="sd-search"><input type="text" placeholder="搜索…" oninput="filterStruct(this,'${tbl.name}')"></div><div class="sd-entries" id="sdEntries">${entriesHtml}</div>${tbl.cnt>300?`<div style="color:var(--muted-foreground);padding:0.5rem 0;font-size:0.72rem">… ${tbl.cnt-300} 条</div>`:''}`;}
-function filterStruct(input,tableName){const q=input.value.toLowerCase();const tbl=parser.r.tables.find(t=>t.name===tableName);if(!tbl)return;const f=q?tbl.entries.filter(e=>e.key.toLowerCase().includes(q)||e.text.toLowerCase().includes(q)):tbl.entries;document.getElementById('sdEntries').innerHTML=f.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}')">${parser.escHTML(e.key)}</span><span class="rv">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem"><svg width="12" height="12"><use href="#i-play"/></svg></button></span></div>`).join('');}
+function showStructDetail(tbl){const d=document.getElementById('structDetail');const meta=[{l:'TKEY',v:'0x'+(tbl.tkeyOff||0).toString(16).padStart(6,'0')},{l:'TDAT',v:'0x'+(tbl.tdatOff||0).toString(16).padStart(6,'0')},{l:'条目',v:tbl.cnt},{l:'TKEY',v:(tbl.tkeySz||0)+' B'},{l:'TDAT',v:(tbl.tdatSz||0)+' B'}];const entriesHtml=tbl.entries.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}');toast('已复制键名')">${parser.escHTML(e.key)}</span><span class="rv" ondblclick="openDetail('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem"><svg width="12" height="12"><use href="#i-play"/></svg></button></span></div>`).join('');d.innerHTML=`<div class="sd-h"><h3>${tbl.name}</h3><span class="sd-t">${tbl.name==='MAIN'?'主表':'子表'}</span></div><div class="sd-meta">${meta.map(m=>`<div class="md"><span class="ml">${m.l}</span><span class="mv">${m.v}</span></div>`).join('')}</div><div class="sd-search"><input type="text" placeholder="搜索…" oninput="filterStruct(this,'${tbl.name}')"></div><div class="sd-entries" id="sdEntries">${entriesHtml}</div>${tbl.cnt>300?`<div style="color:var(--muted-foreground);padding:0.5rem 0;font-size:0.72rem">… ${tbl.cnt-300} 条</div>`:''}`;}
+function filterStruct(input,tableName){const q=input.value.toLowerCase();const tbl=parser.r.tables.find(t=>t.name===tableName);if(!tbl)return;const f=q?tbl.entries.filter(e=>e.key.toLowerCase().includes(q)||e.text.toLowerCase().includes(q)):tbl.entries;document.getElementById('sdEntries').innerHTML=f.slice(0,300).map((e,i)=>`<div class="sd-r"><span class="ri">${i}</span><span class="rk" onclick="copyText('${parser.escHTML(e.key)}');toast('已复制键名')">${parser.escHTML(e.key)}</span><span class="rv" ondblclick="openDetail('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')">${hlTokens(parser.escHTML(e.text))}</span><span><button class="btn btn-sm btn-primary" onclick="openFlow('${parser.escHTML(e.table)}','${parser.escHTML(e.key)}')" style="font-size:0.62rem;padding:0.12rem 0.3rem"><svg width="12" height="12"><use href="#i-play"/></svg></button></span></div>`).join('');}
 
 // ========== STATS ==========
 function renderStatsPanel(){
@@ -820,7 +894,7 @@ function renderStatsPanel(){
   const shortest=[...allEntries].filter(e=>e.text.length>0).sort((a,b)=>a.text.length-b.text.length).slice(0,10);
   
   // Encoding info
-  const fmtName=getFormatName();const encoding=parser.r.format==='sa'?(parser.r.bits===16?`UTF-16LE (${fmtName} 16bit)`:`UTF-8 / GBK / Win-1252 (${fmtName} 8bit, 智能检测)`):'UTF-16LE';
+  const fmtName=getFormatName();let encoding='UTF-16LE';if(parser.r.format==='sa'){encoding='Windows-1252 (SA)';}else if(parser.r.format==='iv'){encoding=parser.r.bits===16?'IV 伪16bit编码':'IV 自定义8bit编码';}
   
   el.innerHTML=`
     <div class="stats">
@@ -940,6 +1014,9 @@ function toggleTheme(){
   var ic=document.getElementById('themeIcon');if(ic)ic.innerHTML='<use href="'+(isDark?'#i-sun':'#i-moon')+'"/>';
   localStorage.setItem('gxt-theme',isDark?'light':'dark');
 }
+
+// Update font size display
+(function(){const el=document.getElementById('fontSizeVal');if(el)el.textContent=baseFontSize+'px';})();
 
 // Load saved theme
 (function(){
@@ -1108,6 +1185,144 @@ function formatSize(bytes){if(bytes<1024)return bytes+' B';if(bytes<1024*1024)re
   }
 })();
 
+
+// ========== CONTEXT MENU ==========
+let ctxEntry = null; // current entry for context menu
+const ctxMenu = document.getElementById('ctxMenu');
+
+function openCtxMenu(e, tableName, key) {
+  e.preventDefault();
+  e.stopPropagation();
+  ctxEntry = allEntries.find(en => en.table === tableName && en.key === key);
+  if (!ctxEntry) return;
+  ctxMenu.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
+  ctxMenu.style.top = Math.min(e.clientY, window.innerHeight - 250) + 'px';
+  ctxMenu.classList.add('open');
+}
+
+document.addEventListener('click', () => ctxMenu.classList.remove('open'));
+document.addEventListener('contextmenu', e => {
+  if (!e.target.closest('#entriesBody tr') && !e.target.closest('.sd-r')) {
+    ctxMenu.classList.remove('open');
+  }
+});
+
+function ctxCopyKey() { if (ctxEntry) { copyText(ctxEntry.key); toast('已复制键名: ' + ctxEntry.key); } ctxMenu.classList.remove('open'); }
+function ctxCopyText() { if (ctxEntry) { copyText(ctxEntry.text); toast('已复制文本 (' + ctxEntry.text.length + ' 字符)'); } ctxMenu.classList.remove('open'); }
+function ctxCopyBoth() { if (ctxEntry) { copyText(ctxEntry.key + '\t' + ctxEntry.text); toast('已复制键名+文本'); } ctxMenu.classList.remove('open'); }
+function ctxCopyHex() { if (ctxEntry) { copyText('0x' + ctxEntry.absOffset.toString(16).padStart(6, '0')); toast('已复制偏移地址'); } ctxMenu.classList.remove('open'); }
+function ctxGoHex() { if (ctxEntry) { goToHex(ctxEntry.absOffset); } ctxMenu.classList.remove('open'); }
+function ctxPlayFlow() { if (ctxEntry) { openFlow(ctxEntry.table, ctxEntry.key); } ctxMenu.classList.remove('open'); }
+function ctxEdit() { ctxMenu.classList.remove('open'); showEditWarn(); }
+
+// ========== ENTRY DETAIL MODAL ==========
+function openDetail(tableName, key) {
+  const entry = allEntries.find(e => e.table === tableName && e.key === key);
+  if (!entry) return;
+  const tbl = parser.r.tables.find(t => t.name === entry.table);
+  document.getElementById('detailTitle').textContent = entry.key;
+  const textPreview = entry.text.length > 500 ? entry.text.substring(0, 500) + '…' : entry.text;
+  const tokenCount = (entry.text.match(/~[^~]+~/g) || []).length;
+  document.getElementById('detailBody').innerHTML = `
+    <div class="detail-row"><span class="detail-label">键名</span><span class="detail-val mono" style="color:#4ade80;font-weight:600">${parser.escHTML(entry.key)}</span></div>
+    <div class="detail-row"><span class="detail-label">子表</span><span class="detail-val"><span class="td-tbl">${parser.escHTML(entry.table)}</span></span></div>
+    <div class="detail-row"><span class="detail-label">索引</span><span class="detail-val mono">#${entry.idx}</span></div>
+    <div class="detail-row"><span class="detail-label">偏移</span><span class="detail-val mono" style="color:var(--primary);cursor:pointer" onclick="goToHex(${entry.absOffset})">0x${entry.absOffset.toString(16).padStart(6, '0')}</span></div>
+    <div class="detail-row"><span class="detail-label">长度</span><span class="detail-val mono">${entry.text.length} 字符 · ${entry.text.length * 2} 字节</span></div>
+    ${tokenCount ? `<div class="detail-row"><span class="detail-label">Token</span><span class="detail-val mono">${tokenCount} 个</span></div>` : ''}
+    <div class="detail-row"><span class="detail-label">文本</span></div>
+    <div class="detail-text-box">${hlTokens(parser.escHTML(textPreview))}</div>
+  `;
+  document.getElementById('detailActions').innerHTML = `
+    <button class="btn btn-sm" onclick="copyText('${parser.escHTML(entry.key)}');toast('已复制键名')"><svg width="12" height="12" style="vertical-align:-1px;margin-right:2px"><use href="#i-copy"/></svg>复制键名</button>
+    <button class="btn btn-sm" onclick="copyText(document.querySelector('.detail-text-box').textContent);toast('已复制文本')"><svg width="12" height="12" style="vertical-align:-1px;margin-right:2px"><use href="#i-copy"/></svg>复制文本</button>
+    <button class="btn btn-sm" onclick="goToHex(${entry.absOffset});closeDetail()"><svg width="12" height="12" style="vertical-align:-1px;margin-right:2px"><use href="#i-hex"/></svg>查看HEX</button>
+    <button class="btn btn-sm btn-primary" onclick="closeDetail();openFlow('${parser.escHTML(entry.table)}','${parser.escHTML(entry.key)}')"><svg width="12" height="12" style="vertical-align:-1px;margin-right:2px"><use href="#i-play"/></svg>解析流程</button>
+    <button class="btn btn-sm" style="color:var(--amber)" onclick="closeDetail();showEditWarn()"><svg width="12" height="12" style="vertical-align:-1px;margin-right:2px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>编辑</button>
+  `;
+  document.getElementById('detailOverlay').classList.add('open');
+}
+function closeDetail() { document.getElementById('detailOverlay').classList.remove('open'); }
+
+// ========== EDIT WARNING ==========
+function showEditWarn() { document.getElementById('editWarnOverlay').classList.add('open'); }
+function closeEditWarn() { document.getElementById('editWarnOverlay').classList.remove('open'); }
+function goGXTStudio() { window.open('https://gtamodx.com/mods/Y-E8q-AINLYn', '_blank'); closeEditWarn(); }
+
+// ========== FONT SIZE ==========
+let baseFontSize = 14;
+function setFontSize(sz) {
+  baseFontSize = sz;
+  document.documentElement.style.fontSize = sz + 'px';
+  localStorage.setItem('gxt-fontsize', sz);
+  const el = document.getElementById('fontSizeVal');
+  if (el) el.textContent = sz + 'px';
+}
+(function () {
+  const saved = localStorage.getItem('gxt-fontsize');
+  if (saved) { baseFontSize = parseInt(saved); document.documentElement.style.fontSize = baseFontSize + 'px'; }
+})();
+
+// ========== TOAST ==========
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+// ========== PRINT ==========
+function printView() {
+  if (!allEntries.length) return;
+  const w = window.open('', '_blank');
+  let html = '<html><head><title>GXT Export</title><style>body{font-family:sans-serif;padding:20px;font-size:12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:4px 8px;text-align:left}th{background:#f5f5f5;font-weight:600}tr:nth-child(even){background:#fafafa}.tok{color:#6366f1;font-weight:600}</style></head><body>';
+  html += `<h2>GXTSearch - ${getFormatName()}</h2><p>${filteredEntries.length} 条文本 · ${new Date().toLocaleString()}</p>`;
+  html += '<table><thead><tr><th>#</th><th>子表</th><th>键名</th><th>文本内容</th></tr></thead><tbody>';
+  for (let i = 0; i < filteredEntries.length; i++) {
+    const e = filteredEntries[i];
+    html += `<tr><td>${i}</td><td>${parser.escHTML(e.table)}</td><td>${parser.escHTML(e.key)}</td><td>${parser.escHTML(e.text)}</td></tr>`;
+  }
+  html += '</tbody></table></body></html>';
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 300);
+}
+
+// ========== JUMP TO ENTRY ==========
+function jumpToEntry() {
+  const key = prompt('输入键名跳转…');
+  if (!key) return;
+  const idx = allEntries.findIndex(e => e.key === key || e.key.toLowerCase() === key.toLowerCase());
+  if (idx < 0) { toast('未找到: ' + key); return; }
+  document.querySelector('[data-tab="entries"]').click();
+  searchField.value = key;
+  applySearch();
+}
+
+// ========== KEYBOARD NAV FOR TABLE ==========
+document.addEventListener('keydown', e => {
+  // Close modals on Escape
+  if (e.key === 'Escape') {
+    if (document.getElementById('editWarnOverlay').classList.contains('open')) { closeEditWarn(); return; }
+    if (document.getElementById('detailOverlay').classList.contains('open')) { closeDetail(); return; }
+    if (document.getElementById('flowOverlay').classList.contains('open')) { closeFlow(); return; }
+  }
+  // Only handle when entries panel is visible and search is not focused
+  const entriesPanel = document.getElementById('panel-entries');
+  if (!entriesPanel.classList.contains('active')) return;
+  if (document.activeElement === searchField) return;
+  // Ctrl+P = print
+  if ((e.ctrlKey || e.metaKey) && e.key === 'p') { e.preventDefault(); printView(); }
+  // J = jump to entry
+  if (e.key === 'j' || e.key === 'J') { if (!e.ctrlKey && !e.metaKey) { e.preventDefault(); jumpToEntry(); } }
+});
+
+// ========== HOOK INTO TABLE ROWS ==========
+// Patch updateTable to add context menu and double-click on rows
+const _origRenderPage = renderPage;
+
+
 // ========== UTILS ==========
 function copyText(t){try{navigator.clipboard?.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
 function copyAllVisible(){const lines=filteredEntries.map(e=>`${e.key}\t${e.text}`);try{navigator.clipboard?.writeText(lines.join('\n'));}catch(e){const ta=document.createElement('textarea');ta.value=lines.join('\n');document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
@@ -1132,5 +1347,49 @@ function download(name,content,type){
   }
 }
 </script>
+
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctxMenu">
+  <div class="ctx-item" onclick="ctxCopyKey()"><svg><use href="#i-copy"/></svg>复制键名<span class="ctx-key">C</span></div>
+  <div class="ctx-item" onclick="ctxCopyText()"><svg><use href="#i-copy"/></svg>复制文本<span class="ctx-key">T</span></div>
+  <div class="ctx-item" onclick="ctxCopyBoth()"><svg><use href="#i-clipboard"/></svg>复制 键名+文本<span class="ctx-key">B</span></div>
+  <div class="ctx-item" onclick="ctxCopyHex()"><svg><use href="#i-hex"/></svg>复制偏移地址<span class="ctx-key">H</span></div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="ctxGoHex()"><svg><use href="#i-hex"/></svg>跳转到十六进制<span class="ctx-key">G</span></div>
+  <div class="ctx-item" onclick="ctxPlayFlow()"><svg><use href="#i-play"/></svg>查看解析流程<span class="ctx-key">Enter</span></div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item warn" onclick="ctxEdit()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>编辑文本…</div>
+</div>
+
+<!-- Entry Detail Modal -->
+<div class="detail-bg" id="detailOverlay">
+  <div class="detail-box">
+    <div class="detail-hdr">
+      <h3 id="detailTitle">条目详情</h3>
+      <button class="detail-x" onclick="closeDetail()"><svg width="16" height="16"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+    <div class="detail-actions" id="detailActions"></div>
+  </div>
+</div>
+
+<!-- Edit Warning Modal -->
+<div class="editwarn-bg" id="editWarnOverlay">
+  <div class="editwarn-box">
+    <div class="editwarn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+    <div class="editwarn-body">
+      <h3>网页版不支持编辑</h3>
+      <p>GXTSearch 网页版仅提供查看与搜索功能。<br>如需编辑 GXT 文本内容，请使用桌面客户端 <b>GXTStudio</b>。</p>
+    </div>
+    <div class="editwarn-btns">
+      <button class="btn" onclick="closeEditWarn()">取消</button>
+      <button class="btn btn-primary" onclick="goGXTStudio()">下载 GXTStudio</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
 </body>
 </html>
