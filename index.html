@@ -1347,18 +1347,7 @@ function printView() {
     const e = filteredEntries[i];
     html += `<tr><td>${i}</td><td>${parser.escHTML(e.table)}</td><td>${parser.escHTML(e.key)}</td><td>${parser.escHTML(e.text)}</td></tr>`;
   }
-  html += '</tbody></table><div class="status-bar" id="statusBar">
-  <span class="si-dot"></span>
-  <span id="statusFormat">未加载</span>
-  <span>|</span>
-  <span id="statusEntries">0 条</span>
-  <span>|</span>
-  <span id="statusTables">0 子表</span>
-  <span>|</span>
-  <span id="statusSize">0 KB</span>
-  <span style="margin-left:auto" id="statusHint">拖放文件或选择备选文件开始</span>
-</div>
-</body></html>';
+  html += '</tbody></table></body></html>';
   w.document.write(html);
   w.document.close();
   setTimeout(() => w.print(), 300);
@@ -1533,10 +1522,6 @@ function exportFiltered() {
 // ========== UTILS ==========
 function copyText(t){try{navigator.clipboard?.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
 function copyAllVisible(){const lines=filteredEntries.map(e=>`${e.key}\t${e.text}`);try{navigator.clipboard?.writeText(lines.join('\n'));}catch(e){const ta=document.createElement('textarea');ta.value=lines.join('\n');document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
-function exportFiltered(){if(!filteredEntries.length)return;let csv='\uFEFF子表,键名,偏移,文本内容\n';for(const e of filteredEntries)csv+=`"${e.table}","${e.key}","0x${e.absOffset.toString(16)}","${e.text.replace(/"/g,'""')}"\n`;download('gxt_filtered.csv',csv,'text/csv;charset=utf-8');}
-function exportJSON(){if(!parser)return;download('gxt_export.json',JSON.stringify({format:parser.r.format,tables:parser.r.tables.map(t=>({name:t.name,count:t.cnt,entries:t.entries.map(e=>({key:e.key,text:e.text}))}))},null,2),'application/json');}
-function exportCSV(){if(!parser)return;let csv='\uFEFF子表,键名,偏移,文本内容\n';for(const e of parser.r.entries)csv+=`"${e.table}","${e.key}","0x${e.absOffset.toString(16)}","${e.text.replace(/"/g,'""')}"\n`;download('gxt_export.csv',csv,'text/csv;charset=utf-8');}
-function exportTXT(){if(!parser)return;let txt='';for(const t of parser.r.tables){txt+=`[${t.name}]\n`;for(const e of t.entries)txt+=`${e.key}=${e.text}\n`;txt+='\n';}download('gxt_export.txt',txt,'text/plain;charset=utf-8');}
 function download(name,content,type){
   try{
     const blob=new Blob([content],{type});
