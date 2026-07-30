@@ -298,6 +298,26 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 .sd-r .rk{color:#4ade80;font-family:var(--font-mono);font-weight:500;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sd-r .rk:hover{text-decoration:underline}
 .sd-r .rv{color:var(--foreground);word-break:break-word;line-height:1.45;min-width:0}
 
+/* Alt Files */
+.alt-files{margin:1rem 0;border:1px solid var(--card-border);border-radius:var(--radius);background:var(--card-bg);backdrop-filter:blur(20px);overflow:hidden}
+.alt-files-header{padding:0.6rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.5rem;cursor:pointer;user-select:none}
+.alt-files-header:hover{background:var(--muted)}
+.alt-files-header h3{font-size:0.82rem;font-weight:600;flex:1}
+.alt-files-header .arrow{color:var(--muted-foreground);font-size:0.7rem;transition:transform 0.2s}
+.alt-files-header.open .arrow{transform:rotate(90deg)}
+.alt-files-body{display:none;padding:0.6rem 1rem}
+.alt-files-body.open{display:block}
+.alt-files-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.5rem}
+.alt-file{display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all 0.2s;background:var(--secondary)}
+.alt-file:hover{border-color:var(--primary);background:rgba(99,102,241,0.06);transform:translateY(-1px)}
+.alt-file .af-icon{width:28px;height:28px;background:var(--primary);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.7}
+.alt-file .af-icon svg{width:14px;height:14px;color:#fff}
+.alt-file .af-info{min-width:0;flex:1}
+.alt-file .af-name{font-family:var(--font-mono);font-size:0.78rem;font-weight:600;color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.alt-file .af-meta{font-size:0.65rem;color:var(--muted-foreground);font-family:var(--font-mono)}
+.alt-file-loading{padding:1rem;text-align:center;color:var(--muted-foreground);font-size:0.78rem}
+.alt-file-empty{padding:0.8rem;text-align:center;color:var(--muted-foreground);font-size:0.75rem;opacity:0.6}
+
 /* Footer */
 .footer{border-top:1px solid var(--border);padding:2rem 0 1.5rem;margin-top:3rem}
 .footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
@@ -464,6 +484,21 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 
   </div>
 
+  <!-- Alt Files -->
+  <div class="alt-files" id="altFilesSection">
+    <div class="alt-files-header" id="altFilesToggle" onclick="toggleAltFiles()">
+      <svg width="16" height="16" style="opacity:0.5"><use href="#i-folder"/></svg>
+      <h3>备选文件</h3>
+      <span style="font-size:0.72rem;color:var(--muted-foreground);font-family:var(--font-mono)" id="altFilesCount"></span>
+      <span class="arrow">▸</span>
+    </div>
+    <div class="alt-files-body" id="altFilesBody">
+      <div class="alt-file-loading" id="altFilesLoading">正在扫描目录…</div>
+      <div class="alt-files-grid" id="altFilesGrid" style="display:none"></div>
+      <div class="alt-file-empty" id="altFilesEmpty" style="display:none">当前目录未发现 .gxt 文件，可将 .gxt 文件放在同目录下使用</div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <div class="footer">
     <div class="footer-inner">
@@ -534,11 +569,12 @@ uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('dragover'
 fi.addEventListener('change',()=>{if(fi.files.length)loadFile(fi.files[0]);});
 function loadFile(f){const r=new FileReader();r.onload=e=>{rawData=new Uint8Array(e.target.result);uz.classList.add('has-file');uz.innerHTML=`<div style="display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0"><span class="uf-name">${f.name}</span><span class="uf-size">${(f.size/1024).toFixed(1)} KB</span><span class="uf-badge" id="fiFormat">检测中…</span></div><button class="btn btn-sm" onclick="document.getElementById('fileInput').click()">更换</button><input type="file" id="fileInput" accept=".gxt,.txt,.fxt,.dat,.bin">`;document.getElementById('fileInput').addEventListener('change',()=>{if(document.getElementById('fileInput').files.length)loadFile(document.getElementById('fileInput').files[0]);});document.getElementById('mainContent').style.display='block';doParse(e.target.result);};r.readAsArrayBuffer(f);}
 
-async function doParse(buf){parser=new GXTParser(buf);allEntries=[];document.getElementById('parseLog').innerHTML='';document.getElementById('progressFill').style.width='0%';document.getElementById('progressText').textContent='';parser.detect();const fmt=document.getElementById('fiFormat');if(fmt)fmt.textContent=parser.r.format==='sa'?'SA/IV':parser.r.format.toUpperCase();const result=await animatedParse(parser);allEntries=result.entries;filteredEntries=[...allEntries];renderStats(result);renderHex();renderEntries(allEntries);renderStructure(result.tables);populateFilter(result.tables);renderStatsPanel();}
+async function doParse(buf){parser=new GXTParser(buf);allEntries=[];document.getElementById('parseLog').innerHTML='';document.getElementById('progressFill').style.width='0%';document.getElementById('progressText').textContent='';parser.detect();const fmt=document.getElementById('fiFormat');if(fmt)fmt.textContent=getFormatName();const result=await animatedParse(parser);allEntries=result.entries;filteredEntries=[...allEntries];renderStats(result);renderHex();renderEntries(allEntries);renderStructure(result.tables);populateFilter(result.tables);renderStatsPanel();}
 
 async function animatedParse(p){const result=p.parse();const logEl=document.getElementById('parseLog');const fill=document.getElementById('progressFill');const ptxt=document.getElementById('progressText');const total=p.logs.length;const step=parseSpeed<=0?total:parseSpeed;for(let i=0;i<total;i+=step){const batch=p.logs.slice(i,i+step);for(const l of batch){const d=document.createElement('div');d.className='le';d.dataset.tag=l.tag;if(logFilter!=='all'&&l.tag!==logFilter)d.style.display='none';d.innerHTML=`<span class="ln">${l.i}</span><span class="arr">›</span><span class="msg">${l.msg}</span>`;logEl.appendChild(d);}const pct=Math.min(100,((i+step)/total*100)).toFixed(0);fill.style.width=pct+'%';ptxt.textContent=`${pct}% · ${result.entries.length} 条 · ${result.tables.length} 子表`;if(parseSpeed<100){logEl.scrollTop=logEl.scrollHeight;await new Promise(r=>requestAnimationFrame(r));}}const d=document.createElement('div');d.className='le';d.dataset.tag='info';d.innerHTML=`<span class="ln">${total+1}</span><span class="arr">✓</span><span class="msg"><span class="tag tag-e">完成</span> ${result.tables.length} 子表, ${result.entries.length} 条文本</span>`;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;fill.style.width='100%';ptxt.textContent=`完成 · ${result.tables.length} 子表 · ${result.entries.length.toLocaleString()} 条 · ${(rawData.length/1024).toFixed(0)} KB`;return result;}
 
-function renderStats(r){document.getElementById('statsBar').innerHTML=[{l:'格式',v:'SA/IV'},{l:'子表',v:r.tables.length},{l:'条目',v:r.entries.length.toLocaleString()},{l:'大小',v:`${(rawData.length/1024).toFixed(0)} KB`},{l:'编码',v:r.format==='sa'?(r.bits===16?'UTF-16':'智能检测'):'UTF-16LE'}].map(s=>`<div class="stat"><div class="sl">${s.l}</div><div class="sv">${s.v}</div></div>`).join('');}
+function getFormatName(){if(!parser)return'未知';const f=parser.r.format,v=parser.r.version;if(f==='iii')return'GTA III';if(f==='vc')return'GTA VC';if(f==='sa'){if(v===4)return'GTA IV';if(v===3)return'GTA SA';return'SA/IV';}return f.toUpperCase();}
+function renderStats(r){document.getElementById('statsBar').innerHTML=[{l:'格式',v:getFormatName()},{l:'子表',v:r.tables.length},{l:'条目',v:r.entries.length.toLocaleString()},{l:'大小',v:`${(rawData.length/1024).toFixed(0)} KB`},{l:'编码',v:r.format==='sa'?(r.bits===16?'UTF-16':'智能检测'):'UTF-16LE'}].map(s=>`<div class="stat"><div class="sl">${s.l}</div><div class="sv">${s.v}</div></div>`).join('');}
 
 // ========== HEX ==========
 let hexRendered=false;
@@ -637,24 +673,70 @@ function getAdvState(){return{mode:document.querySelector('[data-adv="mode"] .ad
 function buildMatcher(q,adv){if(!q)return null;const cs=adv.caseSensitive;const lq=cs?q:q.toLowerCase();try{if(adv.mode==='regex'){const re=new RegExp(q,cs?'':'i');return s=>re.test(s);}if(adv.mode==='exact')return s=>(cs?s:s.toLowerCase())===lq;if(adv.mode==='wildcard'){const pat='^'+q.replace(/[.+^${}()|[\]\\]/g,'\\$&').replace(/\*/g,'.*').replace(/\?/g,'.')+'$';const re=new RegExp(pat,cs?'':'i');return s=>re.test(s);}if(adv.mode==='fuzzy'){return s=>{const v=cs?s:s.toLowerCase();let qi=0;for(let i=0;i<v.length&&qi<lq.length;i++){if(v[i]===lq[qi])qi++;}return qi===lq.length;};}return s=>(cs?s:s.toLowerCase()).includes(lq);}catch{return s=>s.toLowerCase().includes(q.toLowerCase());}}
 function applySearch(){const q=searchField.value.trim();const adv=getAdvState();let f=[...allEntries];if(adv.table)f=f.filter(e=>e.table===adv.table);if(!isNaN(adv.offFrom))f=f.filter(e=>e.absOffset>=adv.offFrom);if(!isNaN(adv.offTo))f=f.filter(e=>e.absOffset<=adv.offTo);if(!isNaN(adv.lenMin))f=f.filter(e=>e.text.length>=adv.lenMin);if(!isNaN(adv.lenMax))f=f.filter(e=>e.text.length<=adv.lenMax);if(adv.token==='has'){if(adv.tokenType)f=f.filter(e=>e.text.includes(adv.tokenType));else f=f.filter(e=>/~[^~]+~/.test(e.text));}else if(adv.token==='none')f=f.filter(e=>!/~[^~]+~/.test(e.text));if(q){const matcher=buildMatcher(q,adv);if(matcher){if(adv.scope==='key')f=f.filter(e=>adv.negate?!matcher(e.key):matcher(e.key));else if(adv.scope==='text')f=f.filter(e=>adv.negate?!matcher(e.text):matcher(e.text));else f=f.filter(e=>adv.negate?(!matcher(e.key)&&!matcher(e.text)):(matcher(e.key)||matcher(e.text)));}if(q.length>=2&&!searchHistory.includes(q)){searchHistory.unshift(q);if(searchHistory.length>15)searchHistory.pop();}}filteredEntries=f;matchIndices=q?f.map((_,i)=>i):[];currentMatchIdx=q&&matchIndices.length?0:-1;document.getElementById('searchCount').textContent=q?`${matchIndices.length} 匹配`:`${f.length} 条`;document.getElementById('searchPrev').disabled=!q||!matchIndices.length;document.getElementById('searchNext').disabled=!q||!matchIndices.length;updateTable(f,q);if(currentMatchIdx>=0)highlightCurrentMatch();}
 function navMatch(dir){if(!matchIndices.length)return;currentMatchIdx=(currentMatchIdx+dir+matchIndices.length)%matchIndices.length;highlightCurrentMatch();}
-function highlightCurrentMatch(){const rows=document.querySelectorAll('#entriesBody tr');rows.forEach(r=>r.classList.remove('cur'));const ri=matchIndices[currentMatchIdx];if(ri<rows.length){rows[ri].classList.add('cur');rows[ri].scrollIntoView({behavior:'smooth',block:'center'});}document.getElementById('searchCount').textContent=`${currentMatchIdx+1} / ${matchIndices.length}`;}
+function highlightCurrentMatch(){const ri=matchIndices[currentMatchIdx];if(ri===undefined||ri<0)return;const pageIdx=Math.floor(ri/entryPageSize);if(pageIdx!==entryPage){entryPage=pageIdx;renderPage();}const localIdx=ri-entryPage*entryPageSize;const rows=document.querySelectorAll('#entriesBody tr');rows.forEach(r=>r.classList.remove('cur'));if(localIdx>=0&&localIdx<rows.length){rows[localIdx].classList.add('cur');rows[localIdx].scrollIntoView({behavior:'smooth',block:'center'});}document.getElementById('searchCount').textContent=`${currentMatchIdx+1} / ${matchIndices.length}`;}
 function renderSearchHistory(){const list=document.getElementById('shList');if(!searchHistory.length){list.innerHTML='<span style="color:var(--muted-foreground);font-size:0.72rem">暂无</span>';return;}list.innerHTML=searchHistory.map(q=>`<span class="hst-item" onclick="searchField.value='${parser.escHTML(q)}';applySearch();">${parser.escHTML(q)}</span>`).join('');}
 
 // ========== ENTRIES ==========
-// ========== VIRTUAL SCROLL TABLE ==========
+// ========== PAGINATED TABLE ==========
+let entryPage=0,entryPageSize=200,entrySorted=[],entryMatcher=null,entryQuery='';
 function renderEntries(entries){updateTable(entries);}
 function updateTable(entries,q=''){
-  const sorted=[...entries].sort((a,b)=>{let va=a[sortState.col],vb=b[sortState.col];if(typeof va==='string'){va=va.toLowerCase();vb=(vb||'').toLowerCase();}if(va<vb)return sortState.dir==='asc'?-1:1;if(va>vb)return sortState.dir==='asc'?1:-1;return 0;});
-  const matcher=q?buildMatcher(q,getAdvState()):null;
-  document.getElementById('entryInfo').textContent=sorted.length.toLocaleString()+' 条';
+  entrySorted=[...entries].sort((a,b)=>{let va=a[sortState.col],vb=b[sortState.col];if(typeof va==='string'){va=va.toLowerCase();vb=(vb||'').toLowerCase();}if(va<vb)return sortState.dir==='asc'?-1:1;if(va>vb)return sortState.dir==='asc'?1:-1;return 0;});
+  entryMatcher=q?buildMatcher(q,getAdvState()):null;
+  entryQuery=q;
+  entryPage=0;
+  document.getElementById('entryInfo').textContent=entrySorted.length.toLocaleString()+' 条';
+  renderPage();
+}
+function renderPage(){
+  const start=entryPage*entryPageSize;
+  const end=Math.min(start+entryPageSize,entrySorted.length);
+  const page=entrySorted.slice(start,end);
+  const q=entryQuery;
+  const matcher=entryMatcher;
   let html='';
-  for(const e of sorted){
+  for(const e of page){
     let textHTML=hlTokens(parser.escHTML(e.text));
     let keyHTML=parser.escHTML(e.key);
     if(matcher){if(matcher(e.key))keyHTML=hlM(e.key,q);if(matcher(e.text))textHTML=hlMT(e.text,q);}
     html+=`<tr data-t="${parser.escHTML(e.table)}" data-k="${parser.escHTML(e.key)}"><td class="td-tbl">${parser.escHTML(e.table)}</td><td class="td-key" onclick="copyText(this.textContent)">${keyHTML}</td><td class="td-off" onclick="goToHex(${e.absOffset})">0x${e.absOffset.toString(16).padStart(6,'0')}</td><td class="td-txt">${textHTML}</td><td class="td-act"><button class="btn btn-sm btn-primary" onclick="openFlow(this.closest('tr').dataset.t,this.closest('tr').dataset.k)" style="font-size:0.65rem;padding:0.18rem 0.35rem"><svg width="12" height="12" style="vertical-align:-1px"><use href="#i-play"/></svg> 解析</button></td></tr>`;
   }
   document.getElementById('entriesBody').innerHTML=html;
+  renderPagination();
+}
+function renderPagination(){
+  const total=entrySorted.length;
+  const totalPages=Math.ceil(total/entryPageSize);
+  let el=document.getElementById('paginationBar');
+  if(!el){
+    el=document.createElement('div');
+    el.id='paginationBar';
+    el.style.cssText='display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;flex-wrap:wrap;';
+    document.querySelector('#panel-entries .tbl-wrap').after(el);
+  }
+  if(totalPages<=1){el.innerHTML='';return;}
+  let html=`<span style="font-size:0.72rem;color:var(--muted-foreground);font-family:var(--font-mono)">${(entryPage*entryPageSize+1).toLocaleString()}-${Math.min((entryPage+1)*entryPageSize,total).toLocaleString()} / ${total.toLocaleString()}</span>`;
+  html+=`<div class="sg">`;
+  html+=`<button class="sb" onclick="goPage(0)"${entryPage===0?' disabled':''} style="${entryPage===0?'opacity:0.3;':''}">首页</button>`;
+  html+=`<button class="sb" onclick="goPage(${entryPage-1})"${entryPage===0?' disabled':''} style="${entryPage===0?'opacity:0.3;':''}">‹</button>`;
+  const maxShow=7;
+  let pStart=Math.max(0,entryPage-Math.floor(maxShow/2));
+  let pEnd=Math.min(totalPages,pStart+maxShow);
+  if(pEnd-pStart<maxShow)pStart=Math.max(0,pEnd-maxShow);
+  for(let i=pStart;i<pEnd;i++){
+    html+=`<button class="sb${i===entryPage?' on':''}" onclick="goPage(${i})">${i+1}</button>`;
+  }
+  html+=`<button class="sb" onclick="goPage(${entryPage+1})"${entryPage>=totalPages-1?' disabled':''} style="${entryPage>=totalPages-1?'opacity:0.3;':''}">›</button>`;
+  html+=`<button class="sb" onclick="goPage(${totalPages-1})"${entryPage>=totalPages-1?' disabled':''} style="${entryPage>=totalPages-1?'opacity:0.3;':''}">末页</button>`;
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+function goPage(p){
+  const totalPages=Math.ceil(entrySorted.length/entryPageSize);
+  if(p<0||p>=totalPages)return;
+  entryPage=p;
+  renderPage();
+  document.querySelector('#panel-entries .tbl-wrap').scrollTop=0;
 }
 function hlM(s,q){const esc=parser.escHTML(s);try{return esc.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<span class="mh">$1</span>');}catch{return esc;}}
 function hlMT(s,q){let esc=hlTokens(parser.escHTML(s));try{return esc.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<span class="mh">$1</span>');}catch{return esc;}}
@@ -738,7 +820,7 @@ function renderStatsPanel(){
   const shortest=[...allEntries].filter(e=>e.text.length>0).sort((a,b)=>a.text.length-b.text.length).slice(0,10);
   
   // Encoding info
-  const encoding=parser.r.format==='sa'?(parser.r.bits===16?'UTF-16LE (SA/IV 16bit)':'UTF-8 / GBK / Win-1252 (SA/IV 8bit, 智能检测)'):'UTF-16LE';
+  const fmtName=getFormatName();const encoding=parser.r.format==='sa'?(parser.r.bits===16?`UTF-16LE (${fmtName} 16bit)`:`UTF-8 / GBK / Win-1252 (${fmtName} 8bit, 智能检测)`):'UTF-16LE';
   
   el.innerHTML=`
     <div class="stats">
@@ -870,9 +952,158 @@ function toggleTheme(){
   }
 })();
 
+// ========== ALT FILES ==========
+let altFilesExpanded=false;
+function toggleAltFiles(){
+  altFilesExpanded=!altFilesExpanded;
+  const header=document.getElementById('altFilesToggle');
+  const body=document.getElementById('altFilesBody');
+  if(altFilesExpanded){
+    header.classList.add('open');
+    body.classList.add('open');
+    scanAltFiles();
+  }else{
+    header.classList.remove('open');
+    body.classList.remove('open');
+  }
+}
+
+function scanAltFiles(){
+  const grid=document.getElementById('altFilesGrid');
+  const loading=document.getElementById('altFilesLoading');
+  const empty=document.getElementById('altFilesEmpty');
+  loading.style.display='block';
+  grid.style.display='none';
+  empty.style.display='none';
+
+  // Try to fetch directory listing from same path
+  const base=getBasePath();
+  const exts=['.gxt','.fxt','.dat','.bin','.txt'];
+  const knownFiles=discoverFiles(base,exts);
+  knownFiles.then(files=>{
+    loading.style.display='none';
+    if(files.length===0){
+      empty.style.display='block';
+    }else{
+      grid.style.display='grid';
+      document.getElementById('altFilesCount').textContent=files.length+' 个文件';
+      grid.innerHTML=files.map(f=>`
+        <div class="alt-file" onclick="loadAltFile('${escAttr(f.url)}','${escAttr(f.name)}')" title="${escAttr(f.name)}">
+          <div class="af-icon"><svg><use href="#i-folder"/></svg></div>
+          <div class="af-info">
+            <div class="af-name">${escHTML(f.name)}</div>
+            <div class="af-meta">${f.size?formatSize(f.size):'点击加载'}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }).catch(()=>{
+    loading.style.display='none';
+    empty.style.display='block';
+  });
+}
+
+function getBasePath(){
+  // Get the directory of the current HTML file
+  const loc=window.location.href;
+  const idx=loc.lastIndexOf('/');
+  return idx>=0?loc.substring(0,idx+1):'';
+}
+
+async function discoverFiles(base,exts){
+  // Strategy 1: Try GitHub API if it's a github.io domain
+  const host=window.location.hostname;
+  const files=[];
+
+  // Strategy 2: Try common GXT filenames for GTA games
+  const commonNames=[
+    'american.gxt','french.gxt','german.gxt','italian.gxt','spanish.gxt',
+    'japanese.gxt','korean.gxt','chinese.gxt','russian.gxt','portuguese.gxt',
+    'english.gxt','main.gxt','script.gxt','misc.gxt','frontend.gxt',
+    'american.fxt','english.fxt',
+    'sa.gxt','vc.gxt','iii.gxt','iv.gxt','gta_sa.gxt','gta_vc.gxt','gta3.gxt'
+  ];
+
+  // Try fetching each common file with HEAD requests
+  const promises=commonNames.map(async name=>{
+    try{
+      const resp=await fetch(base+name,{method:'HEAD'});
+      if(resp.ok){
+        const size=resp.headers.get('content-length');
+        return{name,url:base+name,size:size?parseInt(size):null};
+      }
+    }catch{}
+    return null;
+  });
+
+  const results=await Promise.all(promises);
+  for(const r of results){if(r)files.push(r);}
+
+  // Strategy 3: If on GitHub Pages, try the API to list directory
+  if(host.endsWith('.github.io')&&!files.length){
+    try{
+      const pathParts=window.location.pathname.split('/').filter(Boolean);
+      if(pathParts.length>=2){
+        const owner=pathParts[0];
+        const repo=pathParts[1].replace(/\.html$/,'');
+        const subPath=pathParts.slice(2).join('/');
+        const apiUrl=`https://api.github.com/repos/${owner}/${repo}/contents/${subPath}`;
+        const resp=await fetch(apiUrl);
+        if(resp.ok){
+          const items=await resp.json();
+          for(const item of items){
+            if(item.type==='file'&&exts.some(e=>item.name.toLowerCase().endsWith(e))){
+              files.push({name:item.name,url:item.download_url,size:item.size});
+            }
+          }
+        }
+      }
+    }catch{}
+  }
+
+  // Deduplicate by name
+  const seen=new Set();
+  return files.filter(f=>{if(seen.has(f.name))return false;seen.add(f.name);return true;});
+}
+
+function loadAltFile(url,name){
+  fetch(url).then(r=>r.arrayBuffer()).then(buf=>{
+    rawData=new Uint8Array(buf);
+    const uz=document.getElementById('uploadZone');
+    uz.classList.add('has-file');
+    uz.innerHTML=`<div style="display:flex;align-items:center;gap:0.6rem;flex:1;min-width:0"><span class="uf-name">${escHTML(name)}</span><span class="uf-size">${(buf.byteLength/1024).toFixed(1)} KB</span><span class="uf-badge" id="fiFormat">检测中…</span></div><button class="btn btn-sm" onclick="document.getElementById('fileInput').click()">更换</button><input type="file" id="fileInput" accept=".gxt,.txt,.fxt,.dat,.bin">`;
+    document.getElementById('fileInput').addEventListener('change',()=>{if(document.getElementById('fileInput').files.length)loadFile(document.getElementById('fileInput').files[0]);});
+    document.getElementById('mainContent').style.display='block';
+    doParse(buf);
+    document.getElementById('mainContent').scrollIntoView({behavior:'smooth'});
+  }).catch(err=>{
+    alert('加载失败: '+err.message);
+  });
+}
+
+function escAttr(s){return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escHTML(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function formatSize(bytes){if(bytes<1024)return bytes+' B';if(bytes<1024*1024)return(bytes/1024).toFixed(1)+' KB';return(bytes/1024/1024).toFixed(1)+' MB';}
+
+// Auto-scan on load if section is visible
+(function(){
+  const section=document.getElementById('altFilesSection');
+  if(section){
+    // Pre-scan to show count even when collapsed
+    const base=getBasePath();
+    const commonNames=['american.gxt','french.gxt','german.gxt','italian.gxt','spanish.gxt','english.gxt','main.gxt','script.gxt','sa.gxt','vc.gxt','iii.gxt'];
+    Promise.all(commonNames.map(async name=>{
+      try{const r=await fetch(base+name,{method:'HEAD'});return r.ok?name:null;}catch{return null;}
+    })).then(results=>{
+      const count=results.filter(Boolean).length;
+      document.getElementById('altFilesCount').textContent=count>0?count+' 个文件':'';
+    }).catch(()=>{});
+  }
+})();
+
 // ========== UTILS ==========
 function copyText(t){try{navigator.clipboard?.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
-function copyAllVisible(){const rows=document.querySelectorAll('#entriesBody tr');const lines=[];rows.forEach(r=>{const cells=r.querySelectorAll('td');if(cells.length>=4)lines.push(`${cells[1].textContent}\t${cells[3].textContent}`);});try{navigator.clipboard?.writeText(lines.join('\n'));}catch(e){const ta=document.createElement('textarea');ta.value=lines.join('\n');document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
+function copyAllVisible(){const lines=filteredEntries.map(e=>`${e.key}\t${e.text}`);try{navigator.clipboard?.writeText(lines.join('\n'));}catch(e){const ta=document.createElement('textarea');ta.value=lines.join('\n');document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
 function exportFiltered(){if(!filteredEntries.length)return;let csv='\uFEFF子表,键名,偏移,文本内容\n';for(const e of filteredEntries)csv+=`"${e.table}","${e.key}","0x${e.absOffset.toString(16)}","${e.text.replace(/"/g,'""')}"\n`;download('gxt_filtered.csv',csv,'text/csv;charset=utf-8');}
 function exportJSON(){if(!parser)return;download('gxt_export.json',JSON.stringify({format:parser.r.format,tables:parser.r.tables.map(t=>({name:t.name,count:t.cnt,entries:t.entries.map(e=>({key:e.key,text:e.text}))}))},null,2),'application/json');}
 function exportCSV(){if(!parser)return;let csv='\uFEFF子表,键名,偏移,文本内容\n';for(const e of parser.r.entries)csv+=`"${e.table}","${e.key}","0x${e.absOffset.toString(16)}","${e.text.replace(/"/g,'""')}"\n`;download('gxt_export.csv',csv,'text/csv;charset=utf-8');}
