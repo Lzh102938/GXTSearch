@@ -1011,20 +1011,43 @@ function getBasePath(){
 }
 
 async function discoverFiles(base,exts){
-  // Strategy 1: Try GitHub API if it's a github.io domain
   const host=window.location.hostname;
   const files=[];
 
-  // Strategy 2: Try common GXT filenames for GTA games
+  // Strategy 1: GitHub Pages — use API to list all files
+  if(host.endsWith('.github.io')){
+    try{
+      const pathParts=window.location.pathname.split('/').filter(Boolean);
+      // For https://user.github.io/repo/ -> pathParts = ['repo']
+      // For https://user.github.io/repo/sub/ -> pathParts = ['repo','sub']
+      const repo=pathParts[0]||'';
+      const subPath=pathParts.slice(1).join('/');
+      const owner=host.replace('.github.io','');
+      const apiUrl=`https://api.github.com/repos/${owner}/${repo}/contents/${subPath}?per_page=100`;
+      const resp=await fetch(apiUrl);
+      if(resp.ok){
+        const items=await resp.json();
+        if(Array.isArray(items)){
+          for(const item of items){
+            if(item.type==='file'&&exts.some(e=>item.name.toLowerCase().endsWith(e))){
+              files.push({name:item.name,url:item.download_url,size:item.size});
+            }
+          }
+        }
+      }
+    }catch(e){console.log('GitHub API scan failed:',e);}
+    if(files.length)return files;
+  }
+
+  // Strategy 2: Try common GXT filenames with HEAD requests
   const commonNames=[
     'american.gxt','french.gxt','german.gxt','italian.gxt','spanish.gxt',
-    'japanese.gxt','korean.gxt','chinese.gxt','russian.gxt','portuguese.gxt',
-    'english.gxt','main.gxt','script.gxt','misc.gxt','frontend.gxt',
+    'english.gxt','main.gxt','script.gxt',
     'american.fxt','english.fxt',
-    'sa.gxt','vc.gxt','iii.gxt','iv.gxt','gta_sa.gxt','gta_vc.gxt','gta3.gxt'
+    'GTASA - american.gxt','GTASA - french.gxt','GTASA - german.gxt',
+    'GTASA - italian.gxt','GTASA - spanish.gxt'
   ];
 
-  // Try fetching each common file with HEAD requests
   const promises=commonNames.map(async name=>{
     try{
       const resp=await fetch(base+name,{method:'HEAD'});
@@ -1038,28 +1061,6 @@ async function discoverFiles(base,exts){
 
   const results=await Promise.all(promises);
   for(const r of results){if(r)files.push(r);}
-
-  // Strategy 3: If on GitHub Pages, try the API to list directory
-  if(host.endsWith('.github.io')&&!files.length){
-    try{
-      const pathParts=window.location.pathname.split('/').filter(Boolean);
-      if(pathParts.length>=2){
-        const owner=pathParts[0];
-        const repo=pathParts[1].replace(/\.html$/,'');
-        const subPath=pathParts.slice(2).join('/');
-        const apiUrl=`https://api.github.com/repos/${owner}/${repo}/contents/${subPath}`;
-        const resp=await fetch(apiUrl);
-        if(resp.ok){
-          const items=await resp.json();
-          for(const item of items){
-            if(item.type==='file'&&exts.some(e=>item.name.toLowerCase().endsWith(e))){
-              files.push({name:item.name,url:item.download_url,size:item.size});
-            }
-          }
-        }
-      }
-    }catch{}
-  }
 
   // Deduplicate by name
   const seen=new Set();
@@ -1088,16 +1089,22 @@ function formatSize(bytes){if(bytes<1024)return bytes+' B';if(bytes<1024*1024)re
 // Auto-scan on load if section is visible
 (function(){
   const section=document.getElementById('altFilesSection');
-  if(section){
-    // Pre-scan to show count even when collapsed
-    const base=getBasePath();
-    const commonNames=['american.gxt','french.gxt','german.gxt','italian.gxt','spanish.gxt','english.gxt','main.gxt','script.gxt','sa.gxt','vc.gxt','iii.gxt'];
-    Promise.all(commonNames.map(async name=>{
-      try{const r=await fetch(base+name,{method:'HEAD'});return r.ok?name:null;}catch{return null;}
-    })).then(results=>{
-      const count=results.filter(Boolean).length;
-      document.getElementById('altFilesCount').textContent=count>0?count+' 个文件':'';
-    }).catch(()=>{});
+  if(!section)return;
+  const host=window.location.hostname;
+  // For GitHub Pages, do a quick API pre-scan
+  if(host.endsWith('.github.io')){
+    try{
+      const pathParts=window.location.pathname.split('/').filter(Boolean);
+      const repo=pathParts[0]||'';
+      const subPath=pathParts.slice(1).join('/');
+      const owner=host.replace('.github.io','');
+      fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${subPath}?per_page=100`).then(r=>r.ok?r.json():[]).then(items=>{
+        if(!Array.isArray(items))return;
+        const exts=['.gxt','.fxt','.dat','.bin','.txt'];
+        const count=items.filter(i=>i.type==='file'&&exts.some(e=>i.name.toLowerCase().endsWith(e))).length;
+        document.getElementById('altFilesCount').textContent=count>0?count+' 个文件':'';
+      }).catch(()=>{});
+    }catch{}
   }
 })();
 
