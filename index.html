@@ -370,32 +370,37 @@ tbody tr.cur{background:rgba(99,102,241,0.08);box-shadow:inset 3px 0 0 var(--pri
 /* Click feedback */
 .click-flash{animation:flash 0.3s ease-out}
 @keyframes flash{0%{background:rgba(99,102,241,0.15)}100%{background:transparent}}
+.btn{transition:all 0.2s ease-out}
 .btn:active{transform:scale(0.96);transition:transform 0.05s}
-.stat{cursor:pointer;user-select:none}
+.stat{cursor:pointer;user-select:none;transition:all 0.25s ease-out}
 .stat:active{transform:scale(0.97)}
 
 /* Table row click */
-tbody tr{cursor:pointer;transition:background 0.1s}
+tbody tr{cursor:pointer;transition:background 0.15s ease-out,box-shadow 0.15s ease-out}
 tbody tr:active{background:rgba(99,102,241,0.1)}
 
 /* Tab switch animation */
-.panel.active{animation:fadeIn 0.15s ease-out}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.tab{transition:all 0.2s ease-out}
+.panel.active{animation:fadeIn 0.2s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 /* Upload zone states */
+.upload{transition:all 0.3s ease-out}
 .upload.dragover{border-color:var(--primary);background:rgba(99,102,241,0.08);transform:scale(1.01)}
 
 /* Hex byte click */
+.hx-b{transition:background 0.1s ease-out,color 0.1s ease-out}
 .hx-b:active{background:var(--primary)!important;color:#fff!important}
 
 /* Structure item click */
+.si{transition:all 0.15s ease-out}
 .si:active{background:rgba(99,102,241,0.12)}
 
 /* Progress bar animation */
-.progress .fill{transition:width 0.15s ease-out}
+.progress .fill{transition:width 0.2s ease-out}
 
 /* Alt file hover */
-.alt-file{transition:all 0.15s ease-out}
+.alt-file{transition:all 0.2s ease-out}
 .alt-file:active{transform:scale(0.98);background:rgba(99,102,241,0.1)}
 
 /* Search match flash */
@@ -405,6 +410,26 @@ tbody tr:active{background:rgba(99,102,241,0.1)}
 /* Current row highlight */
 tr.cur{animation:curPulse 1s ease-in-out infinite alternate}
 @keyframes curPulse{from{background:rgba(99,102,241,0.06)}to{background:rgba(99,102,241,0.12)}}
+
+/* Smooth transitions for dynamic elements */
+.search-box{transition:border-color 0.2s ease-out,box-shadow 0.2s ease-out}
+.input,.select{transition:border-color 0.2s ease-out,box-shadow 0.2s ease-out}
+.card{transition:all 0.25s ease-out}
+.ctx-menu{transition:opacity 0.15s ease-out,transform 0.15s ease-out;transform-origin:top left}
+.ctx-menu.open{animation:ctxShow 0.15s ease-out}
+@keyframes ctxShow{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:none}}
+.detail-bg,.editwarn-bg,.flow-bg{transition:opacity 0.2s ease-out}
+.detail-bg.open,.editwarn-bg.open,.flow-bg.open{animation:overlayShow 0.2s ease-out}
+@keyframes overlayShow{from{opacity:0}to{opacity:1}}
+.detail-box,.editwarn-box,.flow{transition:transform 0.25s ease-out}
+.detail-box{animation:modalSlide 0.25s ease-out}
+.editwarn-box{animation:modalSlide 0.25s ease-out}
+@keyframes modalSlide{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+.toast{transition:opacity 0.25s ease-out,transform 0.25s ease-out}
+.toast.show{animation:toastShow 0.25s ease-out}
+@keyframes toastShow{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.font-ctrl .fv{transition:color 0.3s ease-out}
+.hex-body{transition:font-size 0.2s ease-out}
 
 /* Status bar */
 .status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--muted);border-top:1px solid var(--border);padding:0.25rem 1rem;display:flex;align-items:center;gap:1rem;font-size:0.68rem;color:var(--muted-foreground);z-index:50;font-family:var(--font-mono)}
@@ -1067,8 +1092,7 @@ function toggleTheme(){
   localStorage.setItem('gxt-theme',isDark?'light':'dark');
 }
 
-// Update font size display
-(function(){const el=document.getElementById('fontSizeVal');if(el)el.textContent=baseFontSize+'px';})();
+// Update font size display (merged with restore below)
 
 // Load saved theme
 (function(){
@@ -1101,39 +1125,95 @@ function scanAltFiles(){
   const grid=document.getElementById('altFilesGrid');
   const loading=document.getElementById('altFilesLoading');
   const empty=document.getElementById('altFilesEmpty');
-  loading.style.display='block';
-  loading.textContent='正在扫描目录…';
+  const countEl=document.getElementById('altFilesCount');
+
+  // Always show manual picker first
+  loading.style.display='none';
+  empty.style.display='block';
+  empty.innerHTML='';
   grid.style.display='none';
-  empty.style.display='none';
 
-  const base=getBasePath();
-  const exts=['.gxt','.fxt','.dat','.bin','.txt'];
-
-  // Timeout protection
-  const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),10000));
-
-  Promise.race([discoverFiles(base,exts),timeout]).then(files=>{
-    loading.style.display='none';
-    if(!files||files.length===0){
-      empty.style.display='block';
-    }else{
+  // Build manual picker UI
+  const pickerDiv=document.createElement('div');
+  pickerDiv.style.cssText='text-align:center;padding:0.5rem 0';
+  pickerDiv.innerHTML='<p style="color:var(--muted-foreground);font-size:0.78rem;margin-bottom:0.6rem">选择本地 .gxt 文件加载，或等待自动扫描</p>';
+  const pickBtn=document.createElement('button');
+  pickBtn.className='btn btn-primary';
+  pickBtn.innerHTML='<svg width="14" height="14" style="vertical-align:-2px;margin-right:4px"><use href="#i-folder"/></svg>选择 .gxt 文件';
+  pickBtn.addEventListener('click',function(){
+    const inp=document.createElement('input');
+    inp.type='file';
+    inp.accept='.gxt,.txt,.fxt,.dat,.bin';
+    inp.multiple=true;
+    inp.addEventListener('change',function(){
+      if(!inp.files.length)return;
+      const fileList=[...inp.files];
+      if(fileList.length===1){
+        loadFile(fileList[0]);
+        return;
+      }
+      // Multiple files: show as grid
+      empty.style.display='none';
       grid.style.display='grid';
-      document.getElementById('altFilesCount').textContent=files.length+' 个文件';
-      grid.innerHTML=files.map(f=>`
-        <div class="alt-file" onclick="loadAltFile('${escAttr(f.url)}','${escAttr(f.name)}')" title="${escAttr(f.name)}">
-          <div class="af-icon"><svg><use href="#i-folder"/></svg></div>
-          <div class="af-info">
-            <div class="af-name">${escHTML(f.name)}</div>
-            <div class="af-meta">${f.size?formatSize(f.size):'点击加载'}</div>
-          </div>
-        </div>
-      `).join('');
-    }
-  }).catch(err=>{
-    loading.style.display='none';
-    empty.style.display='block';
-    empty.textContent='扫描失败: '+(err.message||'网络错误')+'，请刷新重试';
-    console.warn('Alt files scan error:',err);
+      countEl.textContent=fileList.length+' 个文件';
+      grid.innerHTML='';
+      fileList.forEach(function(f){
+        const card=document.createElement('div');
+        card.className='alt-file';
+        card.title=f.name;
+        card.innerHTML='<div class="af-icon"><svg><use href="#i-folder"/></svg></div><div class="af-info"><div class="af-name">'+escHTML(f.name)+'</div><div class="af-meta">'+formatSize(f.size)+'</div></div>';
+        card.addEventListener('click',function(){loadFile(f);});
+        grid.appendChild(card);
+      });
+    });
+    inp.click();
+  });
+  pickerDiv.appendChild(pickBtn);
+  empty.appendChild(pickerDiv);
+
+  // Also try auto-discovery (non-blocking)
+  // Try both local discovery and GitHub repo API in parallel
+  var base=getBasePath();
+  var exts=['.gxt','.fxt','.dat','.bin','.txt'];
+  var timeout=new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},8000);});
+
+  Promise.race([
+    Promise.all([
+      discoverFiles(base,exts),
+      discoverFromGitHub(exts)
+    ]).then(function(results){
+      // Merge results from both strategies, deduplicate by name
+      var merged=[];
+      var seen={};
+      for(var i=0;i<results.length;i++){
+        for(var j=0;j<results[i].length;j++){
+          var f=results[i][j];
+          if(!seen[f.name]){
+            seen[f.name]=true;
+            merged.push(f);
+          }
+        }
+      }
+      return merged;
+    }),
+    timeout
+  ]).then(function(files){
+    if(!files||files.length===0)return;
+    // Found remote files — show them
+    empty.style.display='none';
+    grid.style.display='grid';
+    countEl.textContent=files.length+' 个文件';
+    grid.innerHTML='';
+    files.forEach(function(f){
+      var card=document.createElement('div');
+      card.className='alt-file';
+      card.title=f.name;
+      card.innerHTML='<div class="af-icon"><svg><use href="#i-folder"/></svg></div><div class="af-info"><div class="af-name">'+escHTML(f.name)+'</div><div class="af-meta">'+(f.size?formatSize(f.size):'点击加载')+'</div></div>';
+      card.addEventListener('click',function(){loadAltFile(f.url,f.name);});
+      grid.appendChild(card);
+    });
+  }).catch(function(){
+    // Auto-discovery failed — manual picker is already shown, do nothing
   });
 }
 
@@ -1201,6 +1281,29 @@ async function discoverFiles(base,exts){
   return files.filter(f=>{if(seen.has(f.name))return false;seen.add(f.name);return true;});
 }
 
+// Strategy 3: Direct GitHub repo API — always try this as a fallback
+async function discoverFromGitHub(exts){
+  const GITHUB_OWNER='Lzh102938';
+  const GITHUB_REPO='GXTSearch';
+  const apiUrl='https://api.github.com/repos/'+GITHUB_OWNER+'/'+GITHUB_REPO+'/contents/?per_page=100';
+  try{
+    const resp=await fetch(apiUrl);
+    if(!resp.ok)return[];
+    const items=await resp.json();
+    if(!Array.isArray(items))return[];
+    const files=[];
+    for(const item of items){
+      if(item.type==='file'&&exts.some(function(e){return item.name.toLowerCase().endsWith(e);})&&item.name!=='index.html'){
+        files.push({name:item.name,url:item.download_url,size:item.size});
+      }
+    }
+    return files;
+  }catch(e){
+    console.warn('GitHub repo API failed:',e);
+    return[];
+  }
+}
+
 function loadAltFile(url,name){
   toast('正在下载: '+name+'…');
   fetch(url).then(r=>{
@@ -1228,24 +1331,28 @@ function formatSize(bytes){if(bytes<1024)return bytes+' B';if(bytes<1024*1024)re
 
 // Auto-scan on load if section is visible
 (function(){
-  const section=document.getElementById('altFilesSection');
+  var section=document.getElementById('altFilesSection');
   if(!section)return;
-  const host=window.location.hostname;
+  var host=window.location.hostname;
   // For GitHub Pages, do a quick API pre-scan
   if(host.endsWith('.github.io')){
     try{
-      const pathParts=window.location.pathname.split('/').filter(Boolean);
-      const repo=pathParts[0]||'';
-      const subPath=pathParts.slice(1).join('/');
-      const owner=host.replace('.github.io','');
-      fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${subPath}?per_page=100`).then(r=>r.ok?r.json():[]).then(items=>{
+      var pathParts=window.location.pathname.split('/').filter(Boolean);
+      var repo=pathParts[0]||'';
+      var subPath=pathParts.slice(1).join('/');
+      var owner=host.replace('.github.io','');
+      fetch('https://api.github.com/repos/'+owner+'/'+repo+'/contents/'+subPath+'?per_page=100').then(function(r){return r.ok?r.json():[];}).then(function(items){
         if(!Array.isArray(items))return;
-        const exts=['.gxt','.fxt','.dat','.bin','.txt'];
-        const count=items.filter(i=>i.type==='file'&&exts.some(e=>i.name.toLowerCase().endsWith(e))).length;
-        document.getElementById('altFilesCount').textContent=count>0?count+' 个文件':'';
-      }).catch(()=>{});
-    }catch{}
+        var exts=['.gxt','.fxt','.dat','.bin','.txt'];
+        var count=items.filter(function(i){return i.type==='file'&&exts.some(function(e){return i.name.toLowerCase().endsWith(e);});}).length;
+        var el=document.getElementById('altFilesCount');
+        if(el)el.textContent=count>0?count+' 个文件':'';
+      }).catch(function(){});
+    }catch(e){}
   }
+  // Show hint for manual selection
+  var countEl=document.getElementById('altFilesCount');
+  if(countEl)countEl.textContent='点击展开选择文件';
 })();
 
 
@@ -1325,6 +1432,8 @@ function setFontSize(sz) {
 (function () {
   const saved = localStorage.getItem('gxt-fontsize');
   if (saved) { baseFontSize = parseInt(saved); document.documentElement.style.fontSize = baseFontSize + 'px'; }
+  const el = document.getElementById('fontSizeVal');
+  if (el) el.textContent = baseFontSize + 'px';
 })();
 
 // ========== TOAST ==========
